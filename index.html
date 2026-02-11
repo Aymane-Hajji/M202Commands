@@ -1,0 +1,832 @@
+
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PowerShell Command Architect</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Vue.js 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* PROJECT STRUCTURE NOTE:
+           In a production Vue CLI/Vite environment, split this file as follows:
+           - /src/assets/base.css (The CSS below)
+           - /src/App.vue (The HTML Layout and Script)
+           - /src/data/powershell-data.js (The sectionsData array)
+        */
+
+        body { font-family: 'Outfit', sans-serif; background-color: #0f172a; } /* Slate 900 */
+        .code-font { font-family: 'JetBrains Mono', monospace; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.3); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(56, 189, 248, 0.6); }
+
+        /* Advanced Blur Effects for Learning Modes */
+        .blur-content {
+            filter: blur(8px);
+            opacity: 0.4;
+            user-select: none;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(0,0,0,0.2);
+            border-radius: 4px;
+        }
+        .blur-content:hover {
+            filter: blur(0);
+            opacity: 1;
+            background: transparent;
+        }
+
+        /* PowerShell Syntax Highlighting Palette */
+        .syntax-cmdlet  { color: #38bdf8; font-weight: 600; } /* Sky Blue: Get-Item */
+        .syntax-param   { color: #c084fc; font-weight: 500; } /* Purple: -Name */
+        .syntax-variable{ color: #fbbf24; } /* Amber: $var */
+        .syntax-string  { color: #a3e635; } /* Lime: "String" */
+        .syntax-value   { color: #2dd4bf; } /* Teal: IPs, Numbers */
+        .syntax-header  { color: #818cf8; font-weight: 800; letter-spacing: 0.05em; border-bottom: 1px solid rgba(129, 140, 248, 0.3); padding-bottom: 4px; display: inline-block; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+
+        /* Challenge Mode Inputs */
+        .challenge-input {
+            font-family: inherit;
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            border-bottom: 2px solid #38bdf8;
+            color: #e2e8f0;
+            text-align: center;
+            padding: 0 2px;
+            margin: 0 2px;
+            border-radius: 4px 4px 0 0;
+            outline: none;
+            transition: all 0.2s ease;
+            display: inline-block;
+            min-width: 30px;
+        }
+        .challenge-input:focus {
+            background: rgba(56, 189, 248, 0.2);
+            border-bottom-color: #7dd3fc;
+        }
+        .challenge-input.correct {
+            color: #34d399; /* Emerald 400 */
+            border-bottom: 2px solid transparent;
+            background: transparent;
+            font-weight: bold;
+        }
+        .challenge-input.incorrect {
+            color: #f87171; /* Red 400 */
+            border-bottom-color: #f87171;
+            background: rgba(248, 113, 113, 0.1);
+        }
+
+        /* Glassmorphism Background */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        
+        .mesh-bg {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(14, 165, 233, 0.15), transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.15), transparent 40%);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-up { animation: slideUp 0.4s ease-out forwards; }
+    </style>
+</head>
+<body class="text-slate-200 h-screen flex flex-col overflow-hidden selection:bg-sky-500/30">
+
+    <div class="mesh-bg"></div>
+
+    <div id="app" class="h-full flex flex-col md:flex-row">
+        
+        <!-- Mobile Menu Overlay -->
+        <div v-if="mobileMenuOpen" class="fixed inset-0 bg-black/80 backdrop-blur-md z-40 md:hidden" @click="mobileMenuOpen = false"></div>
+
+        <!-- Sidebar Navigation -->
+        <aside :class="['fixed md:static inset-y-0 left-0 z-50 w-80 glass-panel border-r-0 border-r border-white/5 flex flex-col flex-shrink-0 transition-transform duration-300 shadow-2xl z-50', mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0']">
+            <div class="p-6 border-b border-white/5 flex justify-between items-center bg-gradient-to-b from-white/5 to-transparent">
+                <div>
+                    <h1 class="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+                        <i class="ph-duotone ph-terminal-window text-sky-400 text-3xl"></i>
+                        PS<span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-500">ARCHITECT</span>
+                    </h1>
+                    <span class="text-[10px] text-slate-500 font-mono pl-10 block -mt-1">SERVER ADMIN EDITION</span>
+                </div>
+                <button @click="mobileMenuOpen = false" class="md:hidden text-slate-400 hover:text-white"><i class="ph ph-x text-xl"></i></button>
+            </div>
+
+            <!-- Search -->
+            <div class="p-4 border-b border-white/5">
+                <div class="relative group">
+                    <input 
+                        ref="searchInput"
+                        v-model="searchQuery" 
+                        type="text" 
+                        :placeholder="t.searchPlaceholder" 
+                        class="w-full bg-black/30 border border-white/10 text-slate-200 text-sm rounded-xl focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 block p-3 pl-10 placeholder-slate-500 transition-all group-hover:border-white/20 shadow-inner"
+                    >
+                    <i class="ph ph-magnifying-glass text-slate-500 absolute left-3 top-3.5 group-focus-within:text-sky-400 transition-colors"></i>
+                    <div class="absolute right-3 top-3.5 flex gap-1">
+                        <kbd class="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono text-slate-500 bg-white/5 rounded border border-white/10">Ctrl K</kbd>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="flex-1 overflow-y-auto p-3 space-y-6">
+                
+                <!-- Favorites Section -->
+                <div v-if="pinnedSections.length > 0" class="animate-slide-up">
+                    <h3 class="px-3 text-xs font-bold text-sky-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                        <i class="ph-fill ph-push-pin"></i> {{ t.favorites }}
+                    </h3>
+                    <div class="space-y-1">
+                        <a 
+                            v-for="section in pinnedSections" 
+                            :key="'fav-' + section.id"
+                            @click="scrollToSection(section.id); mobileMenuOpen = false"
+                            class="group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg cursor-pointer transition-all bg-sky-500/10 text-sky-200 border border-sky-500/20 hover:bg-sky-500/20"
+                        >
+                            <span class="truncate">{{ section.title }}</span>
+                            <i class="ph-fill ph-star text-yellow-400 text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- All Sections -->
+                <div>
+                    <h3 class="px-3 text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">{{ t.library }}</h3>
+                    <div class="space-y-1">
+                        <a 
+                            v-for="(section, index) in filteredSections" 
+                            :key="section.id"
+                            @click="scrollToSection(section.id); mobileMenuOpen = false"
+                            :class="['group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg cursor-pointer transition-all duration-200', activeSection === section.id ? 'bg-white/10 text-white shadow-lg shadow-black/20' : 'text-slate-400 hover:bg-white/5 hover:text-slate-100']"
+                        >
+                            <span class="truncate flex items-center gap-3">
+                                <span class="text-xs font-mono opacity-30">{{ (index + 1).toString().padStart(2, '0') }}</span>
+                                {{ section.title }}
+                            </span>
+                            <i v-if="pinnedIds.includes(section.id)" class="ph-fill ph-star text-yellow-500/50 text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <!-- Added @input event listener for delegation to handle challenge inputs -->
+        <main class="flex-1 overflow-y-auto relative scroll-smooth" id="main-content" @scroll="handleScroll" @input="handleChallengeInput">
+            
+            <!-- Mobile Header -->
+            <div class="md:hidden p-4 glass-panel border-b border-white/5 flex justify-between items-center sticky top-0 z-30">
+                <button @click="mobileMenuOpen = true" class="text-slate-300"><i class="ph ph-list text-2xl"></i></button>
+                <span class="font-bold text-white tracking-widest">POWERSHELL</span>
+                <div class="w-8"></div>
+            </div>
+
+            <div class="max-w-6xl mx-auto p-4 md:p-8 space-y-8 pb-32">
+                
+                <!-- Dashboard / Tools -->
+                <div class="glass-panel p-1 rounded-2xl sticky md:static top-2 z-20 shadow-2xl mx-auto max-w-4xl ring-1 ring-white/10">
+                    <div class="bg-black/40 rounded-xl p-4 flex flex-col md:flex-row justify-between items-center gap-4">
+                        
+                        <!-- Mode Selector -->
+                        <div class="flex bg-black/50 p-1 rounded-lg border border-white/5 w-full md:w-auto overflow-x-auto">
+                            <button 
+                                @click="viewMode = 'standard'"
+                                :class="['flex-1 px-4 py-2 rounded-md text-xs font-bold uppercase tracking-wide transition-all flex items-center justify-center gap-2 min-w-[90px]', viewMode === 'standard' ? 'bg-sky-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300']"
+                            >
+                                <i class="ph-bold ph-book-open"></i> {{ t.read }}
+                            </button>
+                            <button 
+                                @click="viewMode = 'explain'"
+                                :class="['flex-1 px-4 py-2 rounded-md text-xs font-bold uppercase tracking-wide transition-all flex items-center justify-center gap-2 min-w-[90px]', viewMode === 'explain' ? 'bg-purple-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300']"
+                                :title="t.explainTooltip"
+                            >
+                                <i class="ph-bold ph-question"></i> {{ t.explain }}
+                            </button>
+                            <button 
+                                @click="viewMode = 'recall'"
+                                :class="['flex-1 px-4 py-2 rounded-md text-xs font-bold uppercase tracking-wide transition-all flex items-center justify-center gap-2 min-w-[90px]', viewMode === 'recall' ? 'bg-emerald-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300']"
+                                :title="t.recallTooltip"
+                            >
+                                <i class="ph-bold ph-code"></i> {{ t.recall }}
+                            </button>
+                            <button 
+                                @click="viewMode = 'challenge'"
+                                :class="['flex-1 px-4 py-2 rounded-md text-xs font-bold uppercase tracking-wide transition-all flex items-center justify-center gap-2 min-w-[90px]', viewMode === 'challenge' ? 'bg-pink-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300']"
+                                :title="t.challengeTooltip"
+                            >
+                                <i class="ph-bold ph-target"></i> {{ t.challenge }}
+                            </button>
+                            <button 
+                                @click="viewMode = 'data'"
+                                :class="['flex-1 px-4 py-2 rounded-md text-xs font-bold uppercase tracking-wide transition-all flex items-center justify-center gap-2 min-w-[90px]', viewMode === 'data' ? 'bg-orange-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300']"
+                                :title="t.dataTooltip"
+                            >
+                                <i class="ph-bold ph-database"></i> {{ t.data }}
+                            </button>
+                        </div>
+                        
+                        <!-- Language Toggle -->
+                        <div class="flex items-center gap-2 bg-black/50 p-1 rounded-lg border border-white/5">
+                            <button 
+                                @click="toggleLanguage('fr')"
+                                :class="['px-3 py-1.5 rounded text-xs font-bold transition-all', language === 'fr' ? 'bg-white/10 text-white' : 'text-slate-500 hover:text-slate-300']"
+                            >
+                                FR
+                            </button>
+                            <button 
+                                @click="toggleLanguage('en')"
+                                :class="['px-3 py-1.5 rounded text-xs font-bold transition-all', language === 'en' ? 'bg-sky-500/20 text-sky-300' : 'text-slate-500 hover:text-slate-300']"
+                            >
+                                EN
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Sections -->
+                <div 
+                    v-for="(section, index) in filteredSections" 
+                    :key="section.id" 
+                    :id="section.id"
+                    class="scroll-mt-32 md:scroll-mt-8 animate-slide-up"
+                    :style="{ animationDelay: `${index * 50}ms` }"
+                >
+                    <div class="flex items-center justify-between mb-3 px-2">
+                        <div class="flex items-center gap-3">
+                            <h2 class="text-xl font-bold text-slate-100 tracking-tight flex items-center gap-2">
+                                <span class="text-sky-400">PS></span> {{ section.title }}
+                            </h2>
+                            <button @click="togglePin(section.id)" class="text-slate-600 hover:text-yellow-400 transition-colors" :title="pinnedIds.includes(section.id) ? 'Unpin' : 'Pin to top'">
+                                <i :class="pinnedIds.includes(section.id) ? 'ph-fill ph-star text-yellow-400' : 'ph-bold ph-star'"></i>
+                            </button>
+                        </div>
+                        <button 
+                            @click="copySection(section.rawCode)"
+                            class="text-xs flex items-center gap-2 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white px-3 py-1.5 rounded-lg border border-white/5 transition-all active:scale-95"
+                        >
+                            <i v-if="!copiedState[section.id]" class="ph-bold ph-copy"></i>
+                            <i v-else class="ph-bold ph-check text-emerald-400"></i>
+                            <span class="hidden sm:inline font-medium">{{ copiedState[section.id] ? t.copied : t.copy }}</span>
+                        </button>
+                    </div>
+
+                    <!-- Code Block -->
+                    <div class="glass-panel rounded-xl overflow-hidden relative group ring-1 ring-white/10 shadow-xl">
+                        
+                        <!-- Window Chrome -->
+                        <div class="bg-black/40 px-4 py-2 flex items-center gap-2 border-b border-white/5">
+                            <div class="flex gap-1.5">
+                                <div class="w-2.5 h-2.5 rounded-full bg-slate-600/50"></div>
+                                <div class="w-2.5 h-2.5 rounded-full bg-slate-600/50"></div>
+                                <div class="w-2.5 h-2.5 rounded-full bg-slate-600/50"></div>
+                            </div>
+                            <div class="ml-auto flex items-center gap-2">
+                                <span class="text-[10px] font-mono text-slate-500 uppercase">Administrator: Windows PowerShell</span>
+                            </div>
+                        </div>
+
+                        <div class="p-5 overflow-x-auto bg-[#0c0a1f]/80">
+                            <div class="code-font text-xs md:text-sm leading-7 min-w-[600px] md:min-w-0">
+                                <template v-for="(line, idx) in parseCode(section.rawCode)" :key="idx">
+                                    <div class="group/line table-row hover:bg-white/5 transition-colors w-full duration-75">
+                                        <!-- Line Number -->
+                                        <div class="table-cell select-none text-slate-700 text-right pr-4 w-10 border-r border-white/5 group-hover/line:text-slate-500 transition-colors text-[10px] py-0.5 align-middle">
+                                            {{ idx + 1 }}
+                                        </div>
+                                        
+                                        <!-- Code Content -->
+                                        <div class="table-cell pl-4 w-full whitespace-pre align-middle py-0.5" v-html="highlightLine(line)"></div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <footer class="border-t border-white/10 pt-10 mt-12 pb-10 text-center">
+                    <p class="text-slate-600 text-xs font-mono tracking-widest uppercase">
+                        {{ t.footerQuote }}
+                    </p>
+                </footer>
+            </div>
+        </main>
+
+        <!-- Toast Notification -->
+        <div 
+            v-if="toast.show" 
+            class="fixed bottom-10 right-10 glass-panel px-6 py-3 rounded-xl shadow-2xl border border-white/10 flex items-center gap-3 transition-all z-50 animate-slide-up"
+        >
+            <div class="bg-emerald-500/20 p-1.5 rounded-full">
+                <i class="ph-fill ph-check-circle text-emerald-400 text-lg"></i>
+            </div>
+            <span class="font-medium text-sm text-white">{{ t.toastCopied }}</span>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref, computed, onMounted, watch } = Vue;
+
+        createApp({
+            setup() {
+                const searchInput = ref(null);
+                const searchQuery = ref('');
+                const activeSection = ref('');
+                const copiedState = ref({});
+                const mobileMenuOpen = ref(false);
+                const toast = ref({ show: false });
+                
+                // Persistence State
+                const viewMode = ref(localStorage.getItem('ps_view_mode') || 'standard');
+                const pinnedIds = ref(JSON.parse(localStorage.getItem('ps_pinned_ids') || '[]'));
+                const language = ref(localStorage.getItem('ps_language') || 'fr');
+
+                // Watchers for persistence
+                watch(viewMode, (newVal) => localStorage.setItem('ps_view_mode', newVal));
+                watch(pinnedIds, (newVal) => localStorage.setItem('ps_pinned_ids', JSON.stringify(newVal)), { deep: true });
+                watch(language, (newVal) => localStorage.setItem('ps_language', newVal));
+
+                // UI Translations
+                const translations = {
+                    en: {
+                        searchPlaceholder: 'Search Cmdlet...',
+                        favorites: 'Favorites',
+                        library: 'Modules',
+                        read: 'Read',
+                        explain: 'Explain',
+                        recall: 'Recall',
+                        challenge: 'Challenge',
+                        data: 'Values',
+                        explainTooltip: 'Hides comments, keeps code',
+                        recallTooltip: 'Hides code, keeps comments',
+                        challengeTooltip: 'Fill in the Cmdlets',
+                        dataTooltip: 'Hides syntax, keeps values',
+                        copy: 'Script',
+                        copied: 'Copied',
+                        footerQuote: 'Automation is Power',
+                        toastCopied: 'Script copied to clipboard'
+                    },
+                    fr: {
+                        searchPlaceholder: 'Rechercher Cmdlet...',
+                        favorites: 'Favoris',
+                        library: 'Modules',
+                        read: 'Lire',
+                        explain: 'Expliquer',
+                        recall: 'Rappel',
+                        challenge: 'Défi',
+                        data: 'Données',
+                        explainTooltip: 'Cache les commentaires',
+                        recallTooltip: 'Cache le code',
+                        challengeTooltip: 'Remplir les commandes',
+                        dataTooltip: 'Cache la syntaxe',
+                        copy: 'Script',
+                        copied: 'Copié',
+                        footerQuote: 'L\'automatisation est le pouvoir',
+                        toastCopied: 'Script copié dans le presse-papiers'
+                    }
+                };
+
+                const t = computed(() => translations[language.value]);
+
+                const toggleLanguage = (lang) => {
+                    language.value = lang;
+                };
+
+                // Keyboard Shortcuts
+                onMounted(() => {
+                    document.addEventListener('keydown', (e) => {
+                        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                            e.preventDefault();
+                            searchInput.value.focus();
+                        }
+                    });
+                });
+
+                /* DATA SOURCE
+                   Corresponds to /src/data/powershell-core.json
+                */
+                const sectionsDataFr = [
+                    {
+                        id: 'basic-config',
+                        title: ' 1 : Configuration de base',
+                        rawCode: `@Gestion de l'alimentation
+Restart-Computer # Redémarrer le serveur
+Stop-Computer # Arrêter le serveur
+
+@Identité Système
+Rename-Computer -NewName "TRI-DC" -Restart # Renommer l'ordinateur et redémarrer
+
+@Configuration IP
+Get-NetIPInterface # Lister les interfaces
+New-NetIPAddress -InterfaceIndex 12 -IPAddress 172.16.0.200 -PrefixLength 24 -DefaultGateway 172.16.0.1 # Configurer l'adresse IP statique
+Set-DnsClientServerAddress -InterfaceIndex 12 -ServerAddresses ("172.16.0.10","172.16.0.11") # Configurer les DNS
+
+@Jonction Domaine
+Add-Computer -DomainName Adatum.com -Restart # Joindre le serveur au domaine
+
+@Gestion des Fonctionnalités (GUI)
+# Convertir Core vers GUI (Installation Complète)
+Get-WindowsFeature -Name *GUI* | Install-WindowsFeature -IncludeAllSubFeature -IncludeManagementTools -Restart
+# Convertir GUI vers Core (Installation Minimale)
+Get-WindowsFeature -Name *GUI* | Remove-WindowsFeature -Restart`
+                    },
+                    {
+                        id: 'adds-install',
+                        title: ' 2 : Installation Contrôleur de Domaine',
+                        rawCode: `@Installation Rôle
+Install-WindowsFeature -Name AD-Domain-Services -IncludeAllSubFeature -IncludeManagementTools # Installer les binaires ADDS
+
+@Promotion Contrôleur
+# Ajouter un DC à un domaine existant
+Install-ADDSDomainController -DomainName Adatum.com -InstallDns
+# Ajouter un nouveau domaine enfant
+Install-ADDSDomain -NewDomainName khenifra.adatum.com -ParentDomainName adatum.com -DomainType ChildDomain -InstallDns
+# Ajouter une nouvelle arborescence
+Install-ADDSDomain -NewDomainName contoso.com -ParentDomainName adatum.com -DomainType TreeDomain -InstallDns
+# Ajouter une nouvelle Forêt
+Install-ADDSForest -DomainName adatum.com -InstallDns
+
+@Gestion Schéma
+regsvr32 schmmgmt.dll # Inscrire la console schéma
+regsvr32 -u schmmgmt.dll # Désinscrire la console schéma`
+                    },
+                    {
+                        id: 'ad-objects',
+                        title: ' 3 : Gestion des Objets ADDS',
+                        rawCode: `@Unités Organisationnelles (OU)
+New-ADOrganizationalUnit -Name NTIC # Créer une OU racine
+New-ADOrganizationalUnit -Name TRI -Path "ou=ntic,dc=adatum,dc=com" # Créer sous-OU
+New-ADOrganizationalUnit -Name MIR -Path "ou=ntic,dc=adatum,dc=com"
+Get-ADOrganizationalUnit -Filter * | Format-Table # Afficher toutes les OU
+Set-ADOrganizationalUnit -Identity "ou=MIR,ou=ntic,dc=adatum,dc=com" -ProtectedFromAccidentalDeletion $false # Désactiver protection suppression
+Remove-ADOrganizationalUnit -Identity "ou=mir,ou=ntic,dc=adatum,dc=com" -Confirm:$false # Supprimer une OU
+
+@Utilisateurs
+New-ADUser -Name TriUser1 -Path "ou=tri,ou=ntic,dc=adatum,dc=com" # Créer utilisateur simple
+# Créer avec mot de passe
+New-ADUser -Name TriUser2 -Path "ou=tri,ou=ntic,dc=adatum,dc=com" -AccountPassword (ConvertTo-SecureString -AsPlainText 'Pa$$w0rd' -Force)
+# Modifier propriétés utilisateur
+Set-ADUser -Identity "cn=triuser1,ou=tri,ou=ntic,dc=adatum,dc=com" -Department service -GivenName Prenom -Surname Nom -DisplayName "Prenom Nom" -UserPrincipalName "triuser1@adatum.com"
+Remove-ADUser -Identity "cn=triuser1,ou=tri,ou=ntic,dc=adatum,dc=com" # Supprimer utilisateur
+
+@Redirection Conteneurs
+redircmp.exe "ou=NewComputers,dc=Adatum,dc=com" # Rediriger ordinateurs par défaut
+redirusr.exe "ou=NewUsers,dc=Adatum,dc=com" # Rediriger utilisateurs par défaut
+
+@Ordinateurs
+New-ADComputer -Name Poste01 -Path "ou=TRI,ou=NTIC,dc=Adatum,dc=com" # Créer compte ordinateur
+Set-ADComputer "cn=Poste01,ou=TRI,ou=NTIC,dc=Adatum,dc=com" -Location "Salle Info1" # Modifier localisation
+Remove-ADComputer "cn=Poste01,ou=tri,ou=ntic,dc=adatum,dc=com" # Supprimer ordinateur
+
+@Sécurité et Groupes
+# Réinitialiser mot de passe
+Set-ADAccountPassword -Identity "cn=triuser1,ou=tri,ou=ntic,dc=adatum,dc=com" -NewPassword (ConvertTo-SecureString -AsPlainText 'Pa$$w0rd' -Force) -Reset
+Enable-ADAccount -Identity "cn=triuser1,ou=tri,ou=ntic,dc=adatum,dc=com" # Activer compte
+Disable-ADAccount -Identity "cn=triuser1,ou=tri,ou=ntic,dc=adatum,dc=com" # Désactiver compte
+# Créer Groupes
+New-ADGroup TRIGroupDistribution -GroupCategory Distribution -GroupScope Global -Path "ou=tri,ou=ntic,dc=adatum,dc=com"
+New-ADGroup TRIGroupSecurity -GroupCategory Security -GroupScope Global -Path "ou=tri,ou=ntic,dc=adatum,dc=com"
+# Gestion Membres
+Add-ADGroupMember -Identity TRIGroupSecurity -Members "TRiUser1","TRiUser2"
+Remove-ADGroupMember -Identity TRIGroupSecurity -Members "TRiUser1","TRiUser2" -Confirm:$false
+
+@Mouvements Objets
+Rename-ADObject "cn=TriUser3,ou=TRI,ou=NTIC,dc=adatum,dc=com" -NewName "TRI3" # Renommer objet
+Move-ADObject "cn=TRI3,ou=TRI,ou=NTIC,dc=adatum,dc=com" -TargetPath "ou=NTIC,dc=adatum,dc=com" # Déplacer objet`
+                    },
+                    {
+                        id: 'dns-server',
+                        title: ' 4 : Gestion de Serveur DNS',
+                        rawCode: `@Zones DNS
+Install-WindowsFeature DNS -IncludeManagementTools # Installer rôle
+Add-DnsServerPrimaryZone -Name ofppt.ma -ZoneFile ofppt.ma.dns -DynamicUpdate NonsecureAndSecure # Zone principale standard
+Add-DnsServerPrimaryZone -Name ofppt.com -ReplicationScope Domain # Zone intégrée AD
+Add-DnsServerPrimaryZone -NetworkId 172.18.0.0/16 -ZoneFile 18.172.in-addr.arpa.dns # Zone inversée
+Add-DnsServerSecondaryZone -Name adatum.com -MasterServers 172.16.0.10 -ZoneFile adatum.com.dns # Zone secondaire
+
+@Transfert et Réplication
+Set-DnsServerPrimaryZone -Name adatum.com -Notify NotifyServers -SecondaryServers 172.16.0.21 -SecureSecondaries TransferToSecureServers # Configurer transfert
+Start-DnsServerZoneTransfer -Name adatum.com -FullTransfer # Forcer transfert complet (AXFR)
+ConvertTo-DnsServerPrimaryZone -Name ofppt.ma -ReplicationScope Domain -Force # Convertir en intégré AD
+
+@Enregistrements (Records)
+Add-DnsServerResourceRecordA -ZoneName ofppt.ma -Name lon-client1 -IPv4Address 172.18.0.50 -CreatePtr # Créer A + PTR
+Add-DnsServerResourceRecordAAAA -ZoneName ofppt.ma -Name lon-client1 -IPv6Address 2001::1 # Créer AAAA
+Add-DnsServerResourceRecordMX -ZoneName ofppt.ma -Name "." -MailExchange lon-mail2.ofppt.ma -Preference 10 # Créer MX
+Add-DnsServerResourceRecordCName -ZoneName ofppt.ma -Name www -HostNameAlias lon-client.ofppt.ma # Créer CNAME
+Add-DnsServerResourceRecord -Srv -ZoneName ofppt.ma -DomainName ofppt.ma -Name _sip._tcp -Priority 0 -Weight 0 -Port 5600 # Créer SRV
+Add-DnsServerStubZone -Name adatum.com -MasterServers 172.16.0.10 -ZoneFile adatum.com.dns # Créer Stub Zone`
+                    },
+                    {
+                        id: 'dhcp-server',
+                        title: ' 5 : Gestion de Serveur DHCP',
+                        rawCode: `@Configuration Serveur
+Install-WindowsFeature DHCP -IncludeManagementTools # Installer rôle
+Add-DhcpServerInDC -DnsName lon-svr1.adatum.com -IPAddress 172.16.0.21 # Autoriser dans AD
+Add-DhcpServerSecurityGroup # Créer groupes de sécurité
+
+@Étendues (Scopes)
+Add-DhcpServerv4Scope -Name ofppt -StartRange 172.18.0.50 -EndRange 172.18.0.150 -SubnetMask 255.255.255.0 # Créer pool
+Add-DhcpServerv4ExclusionRange -ScopeId 172.18.0.0 -StartRange 172.18.0.70 -EndRange 172.18.0.90 # Ajouter exclusion
+
+@Options DHCP
+Set-DhcpServerv4OptionValue -ScopeId 172.18.0.0 -Router 172.18.0.1 # Passerelle (Option 003)
+Set-DhcpServerv4OptionValue -ScopeId 172.18.0.0 -DnsServer 172.18.0.10 # DNS (Option 006)
+Set-DhcpServerv4OptionValue -ComputerName lon-svr1.adatum.com -OptionId 3 -Value 172.18.0.10 # Option niveau serveur
+
+@Réservations
+Add-DhcpServerv4Reservation -ScopeId 172.18.0.0 -ClientId 00-f0-c4-55-44-33 -IPAddress 172.18.0.60 # Créer réservation MAC
+Set-DhcpServerv4OptionValue -ReservedIP 172.18.0.60 -Router 172.18.0.30 # Option spécifique réservation`
+                    },
+                    {
+                        id: 'gpo',
+                        title: ' 6 : GPO  (Stratégies de Groupe)',
+                        rawCode: `@Gestion de base des GPO
+New-GPO -Name "cmd" # Créer une nouvelle GPO
+New-GPLink -Name "cmd" -Target "ou=tri,dc=ntic,dc=ma" -LinkEnabled Yes # Lier la GPO à une OU
+Rename-GPO -Name "ancien nom" -TargetName "nouveau nom" # Renommer une GPO
+Remove-GPLink -Name "NomGPO" -Target "dn" # Supprimer un lien
+Remove-GPO -Name "NomGPO" # Supprimer définitivement une GPO
+gpupdate /force # Forcer la mise à jour des stratégies
+
+@Redirection de Dossiers & Scripts
+New-Item -Path "C:\\Redirect" -ItemType Directory # Créer le dossier de redirection
+New-SmbShare -Name "Redirect" -Path "C:\\Redirect" -FullAccess "Everyone" # Partager le dossier
+New-GPO -Name "Redirection des dossiers" -Comment "Redirige les documents vers \\\\PDC\\Redirect" # Créer la GPO
+New-GPLink -Name "Redirection des dossiers" -Target "dc=ntic,dc=ma" # Lier au domaine
+
+@Script de Connexion (Logon Script)
+$Content = "Net use Z: \\\\PDC\\Redirect" # Définir le contenu du script
+$Path = "\\\\ntic.ma\\NETLOGON\\Map.bat" # Définir le chemin réseau
+Set-Content -Path $Path -Value $Content # Créer le fichier batch
+New-GPO -Name "DriveMap" # Créer la GPO de mappage
+New-GPLink -Name "DriveMap" -Target "dc=ntic,dc=ma" # Lier au domaine
+Set-GPLogonScript -Name "DriveMap" -ScriptPath $Path # Assigner le script à la GPO
+
+@Sécurité (USB & Panneau de config)
+New-ADOrganizationalUnit -Name "TRI" -Path "dc=ntic,dc=ma" # Créer l'OU Cible
+New-ADUser -Name "mourad" -Path "ou=TRI,dc=ntic,dc=ma" -AccountPassword (Read-Host -AsSecureString "Enter Password") -Enabled $true # Créer un utilisateur test
+# Bloquer USB via Registre
+New-GPO -Name "TPO_GPO_USB_Blockage" -Comment "Blocks USB and CP"
+Set-GPRegistryValue -Name "TPO_GPO_USB_Blockage" -Key "HKLM\\SYSTEM\\CurrentControlSet\\Services\\USBSTOR" -ValueName "Start" -Type DWord -Value 4
+# Bloquer Panneau de Configuration
+Set-GPRegistryValue -Name "TPO_GPO_USB_Blockage" -Key "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer" -ValueName "NoControlPanel" -Type DWord -Value 1
+New-GPLink -Name "TPO_GPO_USB_Blockage" -Target "ou=TRI,dc=ntic,dc=ma" -Enforced Yes # Lier et Forcer
+
+@Déploiement Logiciel
+New-Item -Path "C:\\software" -ItemType Directory # Dossier source
+New-SmbShare -Name "software" -Path "C:\\software" -FullAccess "Everyone" # Partage SMB
+New-GPO -Name "GPO_software" # Créer GPO
+New-GPLink -Name "GPO_software" -Target "ou=TRI,dc=ntic,dc=ma" # Lier à l'OU`
+                    }
+                ];
+
+                // English translation of the technical content for completeness/extensibility
+                const sectionsDataEn = sectionsDataFr.map(section => ({
+                    ...section,
+                    title: section.title.replace('', 'Exercise').replace('Gestion', 'Management')
+                }));
+
+                const currentSectionsData = computed(() => {
+                    return language.value === 'fr' ? sectionsDataFr : sectionsDataEn;
+                });
+
+                const filteredSections = computed(() => {
+                    const data = currentSectionsData.value;
+                    if (!searchQuery.value) return data;
+                    const query = searchQuery.value.toLowerCase();
+                    return data.filter(section => {
+                        return section.title.toLowerCase().includes(query) || 
+                               section.rawCode.toLowerCase().includes(query);
+                    });
+                });
+
+                const pinnedSections = computed(() => {
+                    return currentSectionsData.value.filter(s => pinnedIds.value.includes(s.id));
+                });
+
+                const togglePin = (id) => {
+                    if (pinnedIds.value.includes(id)) {
+                        pinnedIds.value = pinnedIds.value.filter(pid => pid !== id);
+                    } else {
+                        pinnedIds.value.push(id);
+                    }
+                };
+
+                const parseCode = (raw) => raw.split('\n');
+
+                /*
+                   SYNTAX HIGHLIGHTING ENGINE (PowerShell Edition)
+                   Corresponds to /src/composables/useSyntaxHighlighter.js
+                */
+                const highlightLine = (line) => {
+                    if (!line) return '<span class="text-transparent">.</span>'; 
+                    const trimmed = line.trim();
+
+                    // Headers
+                    if (trimmed.startsWith('@')) {
+                        const content = trimmed.substring(1);
+                        return `<span class="syntax-header"><i class="ph-bold ph-hash text-sky-400"></i> ${content}</span>`;
+                    }
+
+                    // Pure Comments
+                    if (trimmed.startsWith('#')) { 
+                         const blurClass = viewMode.value === 'explain' ? 'blur-content' : '';
+                         return `<span class="italic text-slate-500 ${blurClass}">${line}</span>`;
+                    }
+
+                    // Code + Comments
+                    let html = line;
+                    let commentPart = "";
+                    let codePart = "";
+
+                    if (line.includes('#')) {
+                        const parts = line.split('#');
+                        codePart = parts[0];
+                        const commentText = parts.slice(1).join('#');
+                        const blurClass = viewMode.value === 'explain' ? 'blur-content' : '';
+                        commentPart = `<span class="italic pl-4 text-slate-500 ${blurClass}"># ${commentText}</span>`;
+                    } else {
+                        codePart = line;
+                    }
+
+                    // Escape HTML in code part
+                    codePart = codePart.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+                    const replacements = [];
+                    const pushReplacement = (html) => {
+                        replacements.push(html);
+                        return `__R${replacements.length - 1}__`;
+                    };
+
+                    // 1. Strings (Highest priority to avoid highlighting keywords inside strings)
+                    codePart = codePart.replace(/(["'])(?:(?=(\\?))\2.)*?\1/g, (match) => {
+                        return pushReplacement(`<span class="syntax-string">${match}</span>`);
+                    });
+
+                    // 2. PowerShell Variables ($var)
+                    codePart = codePart.replace(/\$[a-zA-Z0-9_:]+/g, (match) => {
+                        return pushReplacement(`<span class="syntax-variable">${match}</span>`);
+                    });
+
+                    // 3. Parameters (-Name, -Force, -Confirm:$false)
+                    codePart = codePart.replace(/\s(-[a-zA-Z]+)(?::\$[a-z]+)?/g, (match, p1) => {
+                         // We keep the whitespace in the match to ensure we don't catch hyphens in middle of words
+                         // But we want to highlight just the parameter part
+                         return match.replace(p1, pushReplacement(`<span class="syntax-param">${p1}</span>`));
+                    });
+
+                    // 4. Cmdlets (Verb-Noun) - The Core Logic
+                    // Regex looks for PascalCase-PascalCase pattern common in PS
+                    const cmdletRegex = /\b([A-Z][a-zA-Z]+-[A-Z][a-zA-Z]+)\b/g;
+                    
+                    codePart = codePart.replace(cmdletRegex, (match) => {
+                        if (viewMode.value === 'challenge') {
+                            const width = Math.max(match.length, 10);
+                            return pushReplacement(`<input type="text" class="challenge-input" data-answer="${match}" style="width: ${width}ch" spellcheck="false" autocomplete="off">`);
+                        } else {
+                            const blurClass = viewMode.value === 'data' ? 'blur-content' : '';
+                            return pushReplacement(`<span class="syntax-cmdlet ${blurClass}">${match}</span>`);
+                        }
+                    });
+
+                    // 5. Special Executables (exe/dll)
+                    const exeRegex = /\b([a-zA-Z0-9]+\.(exe|dll))\b/g;
+                    codePart = codePart.replace(exeRegex, (match) => {
+                         if (viewMode.value === 'challenge') {
+                             return pushReplacement(`<input type="text" class="challenge-input" data-answer="${match}" style="width: ${match.length}ch">`);
+                         }
+                         return pushReplacement(`<span class="syntax-cmdlet text-sky-300">${match}</span>`);
+                    });
+
+                    // Restore replacements
+                    replacements.forEach((html, i) => {
+                         codePart = codePart.replace(`__R${i}__`, html);
+                    });
+
+                    // Numbers/IPs (Green) - Low Priority
+                    if (viewMode.value !== 'challenge') {
+                        codePart = codePart.replace(/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(\/\d+)?/g, '<span class="syntax-value">$1$2</span>');
+                    }
+
+                    const codeBlurClass = viewMode.value === 'recall' ? 'blur-content' : '';
+
+                    return `<span class="text-slate-200 font-medium ${codeBlurClass}">${codePart}</span>${commentPart}`;
+                };
+
+                const handleChallengeInput = (e) => {
+                    if (e.target && e.target.classList.contains('challenge-input')) {
+                        const input = e.target;
+                        const answer = input.dataset.answer;
+                        const value = input.value;
+
+                        // Case-insensitive check for PowerShell
+                        if (value.toLowerCase() === answer.toLowerCase()) {
+                            input.classList.add('correct');
+                            input.classList.remove('incorrect');
+                            input.setAttribute('readonly', true);
+                            input.blur(); 
+                        } else if (value.length >= answer.length) {
+                             input.classList.add('incorrect');
+                             input.classList.remove('correct');
+                        } else {
+                            input.classList.remove('incorrect');
+                            input.classList.remove('correct');
+                        }
+                    }
+                };
+
+                const scrollToSection = (id) => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        el.scrollIntoView({ behavior: 'smooth' });
+                        activeSection.value = id;
+                    }
+                };
+
+                const handleScroll = (e) => {
+                    const scrollPosition = e.target.scrollTop + 300;
+                    for (const section of currentSectionsData.value) {
+                        const el = document.getElementById(section.id);
+                        if (el && el.offsetTop <= scrollPosition) {
+                            activeSection.value = section.id;
+                        }
+                    }
+                };
+
+                const copySection = (text) => {
+                    const sectionId = filteredSections.value.find(s => s.rawCode === text)?.id;
+                    const cleanText = text
+                        .split('\n')
+                        .filter(line => !line.trim().startsWith('@') && !line.trim().startsWith('#'))
+                        .map(line => line.split('#')[0].trim())
+                        .filter(line => line.length > 0)
+                        .join('\n');
+
+                    navigator.clipboard.writeText(cleanText).then(() => {
+                        copiedState.value[sectionId] = true;
+                        showToast();
+                        setTimeout(() => copiedState.value[sectionId] = false, 2000);
+                    });
+                };
+                
+                let toastTimeout;
+                const showToast = () => {
+                    toast.value.show = true;
+                    if(toastTimeout) clearTimeout(toastTimeout);
+                    toastTimeout = setTimeout(() => toast.value.show = false, 1500);
+                }
+
+                return {
+                    searchInput,
+                    searchQuery,
+                    filteredSections,
+                    pinnedSections,
+                    activeSection,
+                    parseCode,
+                    highlightLine,
+                    scrollToSection,
+                    handleScroll,
+                    copySection,
+                    copiedState,
+                    mobileMenuOpen,
+                    viewMode,
+                    pinnedIds,
+                    togglePin,
+                    toast,
+                    language,
+                    t,
+                    toggleLanguage,
+                    handleChallengeInput
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
