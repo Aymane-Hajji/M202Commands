@@ -445,7 +445,7 @@
                 const sectionsDataFr = [
                     {
                         id: 'basic-config',
-                        title: 'ce 1 : Configuration de base',
+                        title: ' 1 : Configuration de base',
                         rawCode: `@Gestion de l'alimentation
 Restart-Computer # Redémarrer le serveur
 Stop-Computer # Arrêter le serveur
@@ -469,7 +469,7 @@ Get-WindowsFeature -Name *GUI* | Remove-WindowsFeature -Restart`
                     },
                     {
                         id: 'adds-install',
-                        title: 'ce 2 : Installation Contrôleur de Domaine',
+                        title: ' 2 : Installation Contrôleur de Domaine',
                         rawCode: `@Installation Rôle
 Install-WindowsFeature -Name AD-Domain-Services -IncludeAllSubFeature -IncludeManagementTools # Installer les binaires ADDS
 
@@ -489,7 +489,7 @@ regsvr32 -u schmmgmt.dll # Désinscrire la console schéma`
                     },
                     {
                         id: 'ad-objects',
-                        title: 'ce 3 : Gestion des Objets ADDS',
+                        title: ' 3 : Gestion des Objets ADDS',
                         rawCode: `@Unités Organisationnelles (OU)
 New-ADOrganizationalUnit -Name NTIC # Créer une OU racine
 New-ADOrganizationalUnit -Name TRI -Path "ou=ntic,dc=adatum,dc=com" # Créer sous-OU
@@ -533,7 +533,7 @@ Move-ADObject "cn=TRI3,ou=TRI,ou=NTIC,dc=adatum,dc=com" -TargetPath "ou=NTIC,dc=
                     },
                     {
                         id: 'dns-server',
-                        title: 'ce 4 : Gestion de Serveur DNS',
+                        title: ' 4 : Gestion de Serveur DNS',
                         rawCode: `@Zones DNS
 Install-WindowsFeature DNS -IncludeManagementTools # Installer rôle
 Add-DnsServerPrimaryZone -Name ofppt.ma -ZoneFile ofppt.ma.dns -DynamicUpdate NonsecureAndSecure # Standard primary zone
@@ -556,7 +556,7 @@ Add-DnsServerStubZone -Name adatum.com -MasterServers 172.16.0.10 -ZoneFile adat
                     },
                     {
                         id: 'dhcp-server',
-                        title: 'ce 5 : Gestion de Serveur DHCP',
+                        title: ' 5 : Gestion de Serveur DHCP',
                         rawCode: `@Configuration Serveur
 Install-WindowsFeature DHCP -IncludeManagementTools # Installer rôle
 Add-DhcpServerInDC -DnsName lon-svr1.adatum.com -IPAddress 172.16.0.21 # Autoriser dans AD
@@ -576,8 +576,8 @@ Add-DhcpServerv4Reservation -ScopeId 172.18.0.0 -ClientId 00-f0-c4-55-44-33 -IPA
 Set-DhcpServerv4OptionValue -ReservedIP 172.18.0.60 -Router 172.18.0.30 # Option spécifique réservation`
                     },
                     {
-                        id: 'gpo',
-                        title: 'ce 6 : GPO (Stratégies de Groupe)',
+                        id: 'gpo-',
+                        title: ' 6 : GPO  (Stratégies de Groupe)',
                         rawCode: `@Gestion de base des GPO
 New-GPO -Name "cmd" # Créer une nouvelle GPO
 New-GPLink -Name "cmd" -Target "ou=tri,dc=ntic,dc=ma" -LinkEnabled Yes # Lier la GPO à une OU
@@ -621,7 +621,7 @@ New-GPLink -Name "GPO_software" -Target "ou=TRI,dc=ntic,dc=ma" # Lier à l'OU`
                 const sectionsDataEn = [
                     {
                         id: 'basic-config',
-                        title: 'se 1: Basic Configuration',
+                        title: ' 1: Basic Configuration',
                         rawCode: `@Power Management
 Restart-Computer # Restart the server
 Stop-Computer # Stop the server
@@ -645,7 +645,7 @@ Get-WindowsFeature -Name *GUI* | Remove-WindowsFeature -Restart`
                     },
                     {
                         id: 'adds-install',
-                        title: 'se 2: Domain Controller Installation',
+                        title: ' 2: Domain Controller Installation',
                         rawCode: `@Role Installation
 Install-WindowsFeature -Name AD-Domain-Services -IncludeAllSubFeature -IncludeManagementTools # Install ADDS binaries
 
@@ -665,7 +665,7 @@ regsvr32 -u schmmgmt.dll # Unregister schema console`
                     },
                     {
                         id: 'ad-objects',
-                        title: 'se 3: ADDS Object Management',
+                        title: ' 3: ADDS Object Management',
                         rawCode: `@Organizational Units (OU)
 New-ADOrganizationalUnit -Name NTIC # Create root OU
 New-ADOrganizationalUnit -Name TRI -Path "ou=ntic,dc=adatum,dc=com" # Create sub-OU
@@ -709,7 +709,7 @@ Move-ADObject "cn=TRI3,ou=TRI,ou=NTIC,dc=adatum,dc=com" -TargetPath "ou=NTIC,dc=
                     },
                     {
                         id: 'dns-server',
-                        title: 'se 4: DNS Server Management',
+                        title: ' 4: DNS Server Management',
                         rawCode: `@DNS Zones
 Install-WindowsFeature DNS -IncludeManagementTools # Install role
 Add-DnsServerPrimaryZone -Name ofppt.ma -ZoneFile ofppt.ma.dns -DynamicUpdate NonsecureAndSecure # Standard primary zone
@@ -732,7 +732,7 @@ Add-DnsServerStubZone -Name adatum.com -MasterServers 172.16.0.10 -ZoneFile adat
                     },
                     {
                         id: 'dhcp-server',
-                        title: 'se 5: DHCP Server Management',
+                        title: ' 5: DHCP Server Management',
                         rawCode: `@Server Configuration
 Install-WindowsFeature DHCP -IncludeManagementTools # Install role
 Add-DhcpServerInDC -DnsName lon-svr1.adatum.com -IPAddress 172.16.0.21 # Authorize in AD
@@ -753,7 +753,7 @@ Set-DhcpServerv4OptionValue -ReservedIP 172.18.0.60 -Router 172.18.0.30 # Specif
                     },
                     {
                         id: 'gpo-',
-                        title: 'se 6: GPO &  (Group Policies)',
+                        title: ' 6: GPO &  (Group Policies)',
                         rawCode: `@Basic GPO Management
 New-GPO -Name "cmd" # Create a new GPO
 New-GPLink -Name "cmd" -Target "ou=tri,dc=ntic,dc=ma" -LinkEnabled Yes # Link GPO to an OU
