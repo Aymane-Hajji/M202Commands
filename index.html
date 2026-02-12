@@ -25,14 +25,14 @@
            - /src/data/powershell-data.js (The sectionsData array)
         */
 
-        body { font-family: 'Outfit', sans-serif; background-color: #0f172a; } /* Slate 900 */
+        body { font-family: 'Outfit', sans-serif; background-color: #030712; }
         .code-font { font-family: 'JetBrains Mono', monospace; }
         
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.3); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(56, 189, 248, 0.6); }
+        ::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.3); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(99, 102, 241, 0.6); }
 
         /* Advanced Blur Effects for Learning Modes */
         .blur-content {
@@ -49,12 +49,12 @@
             background: transparent;
         }
 
-        /* PowerShell Syntax Highlighting Palette */
-        .syntax-cmdlet  { color: #38bdf8; font-weight: 600; } /* Sky Blue: Get-Item */
-        .syntax-param   { color: #c084fc; font-weight: 500; } /* Purple: -Name */
+        /* PowerShell Syntax Highlighting Palette - Matching CCNA Theme */
+        .syntax-cmdlet  { color: #38bdf8; font-weight: 600; } /* Blue: Get-Item */
+        .syntax-param   { color: #c084fc; font-weight: 700; } /* Purple: -Name */
         .syntax-variable{ color: #fbbf24; } /* Amber: $var */
-        .syntax-string  { color: #a3e635; } /* Lime: "String" */
-        .syntax-value   { color: #2dd4bf; } /* Teal: IPs, Numbers */
+        .syntax-string  { color: #4ade80; } /* Green: "String" */
+        .syntax-value   { color: #4ade80; } /* Green: IPs, Numbers */
         .syntax-header  { color: #818cf8; font-weight: 800; letter-spacing: 0.05em; border-bottom: 1px solid rgba(129, 140, 248, 0.3); padding-bottom: 4px; display: inline-block; margin-top: 1.5rem; margin-bottom: 0.5rem; }
 
         /* Challenge Mode Inputs */
@@ -62,7 +62,7 @@
             font-family: inherit;
             background: rgba(255, 255, 255, 0.05);
             border: none;
-            border-bottom: 2px solid #38bdf8;
+            border-bottom: 2px solid #6366f1;
             color: #e2e8f0;
             text-align: center;
             padding: 0 2px;
@@ -74,8 +74,8 @@
             min-width: 30px;
         }
         .challenge-input:focus {
-            background: rgba(56, 189, 248, 0.2);
-            border-bottom-color: #7dd3fc;
+            background: rgba(99, 102, 241, 0.2);
+            border-bottom-color: #818cf8;
         }
         .challenge-input.correct {
             color: #34d399; /* Emerald 400 */
@@ -91,7 +91,7 @@
 
         /* Glassmorphism Background */
         .glass-panel {
-            background: rgba(30, 41, 59, 0.7);
+            background: rgba(17, 24, 39, 0.7);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -102,8 +102,8 @@
             top: 0; left: 0; right: 0; bottom: 0;
             z-index: -1;
             background: 
-                radial-gradient(circle at 10% 20%, rgba(14, 165, 233, 0.15), transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.15), transparent 40%);
+                radial-gradient(circle at 15% 50%, rgba(79, 70, 229, 0.15), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(147, 51, 234, 0.15), transparent 25%);
         }
 
         @keyframes slideUp {
@@ -113,7 +113,7 @@
         .animate-slide-up { animation: slideUp 0.4s ease-out forwards; }
     </style>
 </head>
-<body class="text-slate-200 h-screen flex flex-col overflow-hidden selection:bg-sky-500/30">
+<body class="text-slate-200 h-screen flex flex-col overflow-hidden selection:bg-indigo-500/30">
 
     <div class="mesh-bg"></div>
 
@@ -127,8 +127,8 @@
             <div class="p-6 border-b border-white/5 flex justify-between items-center bg-gradient-to-b from-white/5 to-transparent">
                 <div>
                     <h1 class="text-xl font-bold text-white tracking-tight flex items-center gap-2">
-                        <i class="ph-duotone ph-terminal-window text-sky-400 text-3xl"></i>
-                        PS<span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-blue-500">ARCHITECT</span>
+                        <i class="ph-duotone ph-terminal-window text-indigo-400 text-3xl"></i>
+                        PS<span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">ARCHITECT</span>
                     </h1>
                     <span class="text-[10px] text-slate-500 font-mono pl-10 block -mt-1">SERVER ADMIN EDITION</span>
                 </div>
@@ -143,9 +143,9 @@
                         v-model="searchQuery" 
                         type="text" 
                         :placeholder="t.searchPlaceholder" 
-                        class="w-full bg-black/30 border border-white/10 text-slate-200 text-sm rounded-xl focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 block p-3 pl-10 placeholder-slate-500 transition-all group-hover:border-white/20 shadow-inner"
+                        class="w-full bg-black/30 border border-white/10 text-slate-200 text-sm rounded-xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 block p-3 pl-10 placeholder-slate-500 transition-all group-hover:border-white/20 shadow-inner"
                     >
-                    <i class="ph ph-magnifying-glass text-slate-500 absolute left-3 top-3.5 group-focus-within:text-sky-400 transition-colors"></i>
+                    <i class="ph ph-magnifying-glass text-slate-500 absolute left-3 top-3.5 group-focus-within:text-indigo-400 transition-colors"></i>
                     <div class="absolute right-3 top-3.5 flex gap-1">
                         <kbd class="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono text-slate-500 bg-white/5 rounded border border-white/10">Ctrl K</kbd>
                     </div>
@@ -157,7 +157,7 @@
                 
                 <!-- Favorites Section -->
                 <div v-if="pinnedSections.length > 0" class="animate-slide-up">
-                    <h3 class="px-3 text-xs font-bold text-sky-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                    <h3 class="px-3 text-xs font-bold text-indigo-400 uppercase tracking-widest mb-2 flex items-center gap-2">
                         <i class="ph-fill ph-push-pin"></i> {{ t.favorites }}
                     </h3>
                     <div class="space-y-1">
@@ -165,7 +165,7 @@
                             v-for="section in pinnedSections" 
                             :key="'fav-' + section.id"
                             @click="scrollToSection(section.id); mobileMenuOpen = false"
-                            class="group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg cursor-pointer transition-all bg-sky-500/10 text-sky-200 border border-sky-500/20 hover:bg-sky-500/20"
+                            class="group flex items-center justify-between px-3 py-2 text-sm font-medium rounded-lg cursor-pointer transition-all bg-indigo-500/10 text-indigo-200 border border-indigo-500/20 hover:bg-indigo-500/20"
                         >
                             <span class="truncate">{{ section.title }}</span>
                             <i class="ph-fill ph-star text-yellow-400 text-xs"></i>
@@ -195,7 +195,6 @@
         </aside>
 
         <!-- Main Content -->
-        <!-- Added @input event listener for delegation to handle challenge inputs -->
         <main class="flex-1 overflow-y-auto relative scroll-smooth" id="main-content" @scroll="handleScroll" @input="handleChallengeInput">
             
             <!-- Mobile Header -->
@@ -212,54 +211,65 @@
                     <div class="bg-black/40 rounded-xl p-4 flex flex-col md:flex-row justify-between items-center gap-4">
                         
                         <!-- Mode Selector -->
-                        <div class="flex bg-black/50 p-1 rounded-lg border border-white/5 w-full md:w-auto overflow-x-auto">
-                            <button 
-                                @click="viewMode = 'standard'"
-                                :class="['flex-1 px-4 py-2 rounded-md text-xs font-bold uppercase tracking-wide transition-all flex items-center justify-center gap-2 min-w-[90px]', viewMode === 'standard' ? 'bg-sky-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300']"
-                            >
-                                <i class="ph-bold ph-book-open"></i> {{ t.read }}
-                            </button>
-                            <button 
-                                @click="viewMode = 'explain'"
-                                :class="['flex-1 px-4 py-2 rounded-md text-xs font-bold uppercase tracking-wide transition-all flex items-center justify-center gap-2 min-w-[90px]', viewMode === 'explain' ? 'bg-purple-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300']"
-                                :title="t.explainTooltip"
-                            >
-                                <i class="ph-bold ph-question"></i> {{ t.explain }}
-                            </button>
-                            <button 
-                                @click="viewMode = 'recall'"
-                                :class="['flex-1 px-4 py-2 rounded-md text-xs font-bold uppercase tracking-wide transition-all flex items-center justify-center gap-2 min-w-[90px]', viewMode === 'recall' ? 'bg-emerald-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300']"
-                                :title="t.recallTooltip"
-                            >
-                                <i class="ph-bold ph-code"></i> {{ t.recall }}
-                            </button>
-                            <button 
-                                @click="viewMode = 'challenge'"
-                                :class="['flex-1 px-4 py-2 rounded-md text-xs font-bold uppercase tracking-wide transition-all flex items-center justify-center gap-2 min-w-[90px]', viewMode === 'challenge' ? 'bg-pink-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300']"
-                                :title="t.challengeTooltip"
-                            >
-                                <i class="ph-bold ph-target"></i> {{ t.challenge }}
-                            </button>
-                            <button 
-                                @click="viewMode = 'data'"
-                                :class="['flex-1 px-4 py-2 rounded-md text-xs font-bold uppercase tracking-wide transition-all flex items-center justify-center gap-2 min-w-[90px]', viewMode === 'data' ? 'bg-orange-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300']"
-                                :title="t.dataTooltip"
-                            >
-                                <i class="ph-bold ph-database"></i> {{ t.data }}
-                            </button>
+                        <div class="flex items-center gap-4 w-full md:w-auto">
+                            <div class="flex bg-black/50 p-1 rounded-lg border border-white/5 w-full md:w-auto overflow-x-auto">
+                                <button 
+                                    @click="viewMode = 'standard'"
+                                    :class="['flex-1 px-4 py-2 rounded-md text-xs font-bold uppercase tracking-wide transition-all flex items-center justify-center gap-2 min-w-[90px]', viewMode === 'standard' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300']"
+                                >
+                                    <i class="ph-bold ph-book-open"></i> {{ t.read }}
+                                </button>
+                                <button 
+                                    @click="viewMode = 'explain'"
+                                    :class="['flex-1 px-4 py-2 rounded-md text-xs font-bold uppercase tracking-wide transition-all flex items-center justify-center gap-2 min-w-[90px]', viewMode === 'explain' ? 'bg-purple-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300']"
+                                    :title="t.explainTooltip"
+                                >
+                                    <i class="ph-bold ph-question"></i> {{ t.explain }}
+                                </button>
+                                <button 
+                                    @click="viewMode = 'recall'"
+                                    :class="['flex-1 px-4 py-2 rounded-md text-xs font-bold uppercase tracking-wide transition-all flex items-center justify-center gap-2 min-w-[90px]', viewMode === 'recall' ? 'bg-emerald-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300']"
+                                    :title="t.recallTooltip"
+                                >
+                                    <i class="ph-bold ph-code"></i> {{ t.recall }}
+                                </button>
+                                <button 
+                                    @click="viewMode = 'challenge'"
+                                    :class="['flex-1 px-4 py-2 rounded-md text-xs font-bold uppercase tracking-wide transition-all flex items-center justify-center gap-2 min-w-[90px]', viewMode === 'challenge' ? 'bg-pink-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300']"
+                                    :title="t.challengeTooltip"
+                                >
+                                    <i class="ph-bold ph-target"></i> {{ t.challenge }}
+                                </button>
+                                <button 
+                                    @click="viewMode = 'data'"
+                                    :class="['flex-1 px-4 py-2 rounded-md text-xs font-bold uppercase tracking-wide transition-all flex items-center justify-center gap-2 min-w-[90px]', viewMode === 'data' ? 'bg-orange-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300']"
+                                    :title="t.dataTooltip"
+                                >
+                                    <i class="ph-bold ph-database"></i> {{ t.data }}
+                                </button>
+                            </div>
+
+                            <!-- Progress Indicator (Challenge Mode Only) -->
+                            <div v-if="viewMode === 'challenge'" class="hidden md:flex flex-col items-end animate-slide-up">
+                                <span class="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Progress</span>
+                                <div class="flex items-baseline gap-1">
+                                    <span class="text-xl font-bold text-pink-400">{{ challengeProgress.correct }}</span>
+                                    <span class="text-xs text-slate-600">/ {{ challengeProgress.total }}</span>
+                                </div>
+                            </div>
                         </div>
                         
                         <!-- Language Toggle -->
                         <div class="flex items-center gap-2 bg-black/50 p-1 rounded-lg border border-white/5">
                             <button 
                                 @click="toggleLanguage('fr')"
-                                :class="['px-3 py-1.5 rounded text-xs font-bold transition-all', language === 'fr' ? 'bg-white/10 text-white' : 'text-slate-500 hover:text-slate-300']"
+                                :class="['px-3 py-1.5 rounded text-xs font-bold transition-all', language === 'fr' ? 'bg-indigo-500/20 text-indigo-300' : 'text-slate-500 hover:text-slate-300']"
                             >
                                 FR
                             </button>
                             <button 
                                 @click="toggleLanguage('en')"
-                                :class="['px-3 py-1.5 rounded text-xs font-bold transition-all', language === 'en' ? 'bg-sky-500/20 text-sky-300' : 'text-slate-500 hover:text-slate-300']"
+                                :class="['px-3 py-1.5 rounded text-xs font-bold transition-all', language === 'en' ? 'bg-indigo-500/20 text-indigo-300' : 'text-slate-500 hover:text-slate-300']"
                             >
                                 EN
                             </button>
@@ -279,7 +289,7 @@
                     <div class="flex items-center justify-between mb-3 px-2">
                         <div class="flex items-center gap-3">
                             <h2 class="text-xl font-bold text-slate-100 tracking-tight flex items-center gap-2">
-                                <span class="text-sky-400">PS></span> {{ section.title }}
+                                <span class="text-indigo-400">PS></span> {{ section.title }}
                             </h2>
                             <button @click="togglePin(section.id)" class="text-slate-600 hover:text-yellow-400 transition-colors" :title="pinnedIds.includes(section.id) ? 'Unpin' : 'Pin to top'">
                                 <i :class="pinnedIds.includes(section.id) ? 'ph-fill ph-star text-yellow-400' : 'ph-bold ph-star'"></i>
@@ -349,7 +359,7 @@
     </div>
 
     <script>
-        const { createApp, ref, computed, onMounted, watch } = Vue;
+        const { createApp, ref, computed, onMounted, watch, nextTick } = Vue;
 
         createApp({
             setup() {
@@ -359,6 +369,7 @@
                 const copiedState = ref({});
                 const mobileMenuOpen = ref(false);
                 const toast = ref({ show: false });
+                const challengeProgress = ref({ total: 0, correct: 0 });
                 
                 // Persistence State
                 const viewMode = ref(localStorage.getItem('ps_view_mode') || 'standard');
@@ -366,7 +377,10 @@
                 const language = ref(localStorage.getItem('ps_language') || 'fr');
 
                 // Watchers for persistence
-                watch(viewMode, (newVal) => localStorage.setItem('ps_view_mode', newVal));
+                watch(viewMode, (newVal) => {
+                    localStorage.setItem('ps_view_mode', newVal);
+                    updateProgress();
+                });
                 watch(pinnedIds, (newVal) => localStorage.setItem('ps_pinned_ids', JSON.stringify(newVal)), { deep: true });
                 watch(language, (newVal) => localStorage.setItem('ps_language', newVal));
 
@@ -424,15 +438,14 @@
                             searchInput.value.focus();
                         }
                     });
+                    updateProgress();
                 });
 
-                /* DATA SOURCE
-                   Corresponds to /src/data/powershell-core.json
-                */
+                /* DATA SOURCE */
                 const sectionsDataFr = [
                     {
                         id: 'basic-config',
-                        title: 'Exercice 1 : Configuration de base',
+                        title: 'ce 1 : Configuration de base',
                         rawCode: `@Gestion de l'alimentation
 Restart-Computer # Redémarrer le serveur
 Stop-Computer # Arrêter le serveur
@@ -456,7 +469,7 @@ Get-WindowsFeature -Name *GUI* | Remove-WindowsFeature -Restart`
                     },
                     {
                         id: 'adds-install',
-                        title: 'Exercice 2 : Installation Contrôleur de Domaine',
+                        title: 'ce 2 : Installation Contrôleur de Domaine',
                         rawCode: `@Installation Rôle
 Install-WindowsFeature -Name AD-Domain-Services -IncludeAllSubFeature -IncludeManagementTools # Installer les binaires ADDS
 
@@ -476,7 +489,7 @@ regsvr32 -u schmmgmt.dll # Désinscrire la console schéma`
                     },
                     {
                         id: 'ad-objects',
-                        title: 'Exercice 3 : Gestion des Objets ADDS',
+                        title: 'ce 3 : Gestion des Objets ADDS',
                         rawCode: `@Unités Organisationnelles (OU)
 New-ADOrganizationalUnit -Name NTIC # Créer une OU racine
 New-ADOrganizationalUnit -Name TRI -Path "ou=ntic,dc=adatum,dc=com" # Créer sous-OU
@@ -516,17 +529,17 @@ Remove-ADGroupMember -Identity TRIGroupSecurity -Members "TRiUser1","TRiUser2" -
 
 @Mouvements Objets
 Rename-ADObject "cn=TriUser3,ou=TRI,ou=NTIC,dc=adatum,dc=com" -NewName "TRI3" # Renommer objet
-Move-ADObject "cn=TRI3,ou=TRI,ou=NTIC,dc=adatum,dc=com" -TargetPath "ou=NTIC,dc=adatum,dc=com" # Déplacer objet`
+Move-ADObject "cn=TRI3,ou=TRI,ou=NTIC,dc=adatum,dc=com" -TargetPath "ou=NTIC,dc=adatum,dc=com" # Move object`
                     },
                     {
                         id: 'dns-server',
-                        title: 'Exercice 4 : Gestion de Serveur DNS',
+                        title: 'ce 4 : Gestion de Serveur DNS',
                         rawCode: `@Zones DNS
 Install-WindowsFeature DNS -IncludeManagementTools # Installer rôle
-Add-DnsServerPrimaryZone -Name ofppt.ma -ZoneFile ofppt.ma.dns -DynamicUpdate NonsecureAndSecure # Zone principale standard
+Add-DnsServerPrimaryZone -Name ofppt.ma -ZoneFile ofppt.ma.dns -DynamicUpdate NonsecureAndSecure # Standard primary zone
 Add-DnsServerPrimaryZone -Name ofppt.com -ReplicationScope Domain # Zone intégrée AD
-Add-DnsServerPrimaryZone -NetworkId 172.18.0.0/16 -ZoneFile 18.172.in-addr.arpa.dns # Zone inversée
-Add-DnsServerSecondaryZone -Name adatum.com -MasterServers 172.16.0.10 -ZoneFile adatum.com.dns # Zone secondaire
+Add-DnsServerPrimaryZone -NetworkId 172.18.0.0/16 -ZoneFile 18.172.in-addr.arpa.dns # Reverse lookup zone
+Add-DnsServerSecondaryZone -Name adatum.com -MasterServers 172.16.0.10 -ZoneFile adatum.com.dns # Secondary zone
 
 @Transfert et Réplication
 Set-DnsServerPrimaryZone -Name adatum.com -Notify NotifyServers -SecondaryServers 172.16.0.21 -SecureSecondaries TransferToSecureServers # Configurer transfert
@@ -543,7 +556,7 @@ Add-DnsServerStubZone -Name adatum.com -MasterServers 172.16.0.10 -ZoneFile adat
                     },
                     {
                         id: 'dhcp-server',
-                        title: 'Exercice 5 : Gestion de Serveur DHCP',
+                        title: 'ce 5 : Gestion de Serveur DHCP',
                         rawCode: `@Configuration Serveur
 Install-WindowsFeature DHCP -IncludeManagementTools # Installer rôle
 Add-DhcpServerInDC -DnsName lon-svr1.adatum.com -IPAddress 172.16.0.21 # Autoriser dans AD
@@ -563,8 +576,8 @@ Add-DhcpServerv4Reservation -ScopeId 172.18.0.0 -ClientId 00-f0-c4-55-44-33 -IPA
 Set-DhcpServerv4OptionValue -ReservedIP 172.18.0.60 -Router 172.18.0.30 # Option spécifique réservation`
                     },
                     {
-                        id: 'gpo-dfs',
-                        title: 'Exercice 6 : GPO & DFS (Stratégies de Groupe)',
+                        id: 'gpo',
+                        title: 'ce 6 : GPO (Stratégies de Groupe)',
                         rawCode: `@Gestion de base des GPO
 New-GPO -Name "cmd" # Créer une nouvelle GPO
 New-GPLink -Name "cmd" -Target "ou=tri,dc=ntic,dc=ma" -LinkEnabled Yes # Lier la GPO à une OU
@@ -605,11 +618,10 @@ New-GPLink -Name "GPO_software" -Target "ou=TRI,dc=ntic,dc=ma" # Lier à l'OU`
                     }
                 ];
 
-                // English translation with full content localization
                 const sectionsDataEn = [
                     {
                         id: 'basic-config',
-                        title: 'Exercise 1: Basic Configuration',
+                        title: 'se 1: Basic Configuration',
                         rawCode: `@Power Management
 Restart-Computer # Restart the server
 Stop-Computer # Stop the server
@@ -633,7 +645,7 @@ Get-WindowsFeature -Name *GUI* | Remove-WindowsFeature -Restart`
                     },
                     {
                         id: 'adds-install',
-                        title: 'Exercise 2: Domain Controller Installation',
+                        title: 'se 2: Domain Controller Installation',
                         rawCode: `@Role Installation
 Install-WindowsFeature -Name AD-Domain-Services -IncludeAllSubFeature -IncludeManagementTools # Install ADDS binaries
 
@@ -653,7 +665,7 @@ regsvr32 -u schmmgmt.dll # Unregister schema console`
                     },
                     {
                         id: 'ad-objects',
-                        title: 'Exercise 3: ADDS Object Management',
+                        title: 'se 3: ADDS Object Management',
                         rawCode: `@Organizational Units (OU)
 New-ADOrganizationalUnit -Name NTIC # Create root OU
 New-ADOrganizationalUnit -Name TRI -Path "ou=ntic,dc=adatum,dc=com" # Create sub-OU
@@ -697,7 +709,7 @@ Move-ADObject "cn=TRI3,ou=TRI,ou=NTIC,dc=adatum,dc=com" -TargetPath "ou=NTIC,dc=
                     },
                     {
                         id: 'dns-server',
-                        title: 'Exercise 4: DNS Server Management',
+                        title: 'se 4: DNS Server Management',
                         rawCode: `@DNS Zones
 Install-WindowsFeature DNS -IncludeManagementTools # Install role
 Add-DnsServerPrimaryZone -Name ofppt.ma -ZoneFile ofppt.ma.dns -DynamicUpdate NonsecureAndSecure # Standard primary zone
@@ -720,7 +732,7 @@ Add-DnsServerStubZone -Name adatum.com -MasterServers 172.16.0.10 -ZoneFile adat
                     },
                     {
                         id: 'dhcp-server',
-                        title: 'Exercise 5: DHCP Server Management',
+                        title: 'se 5: DHCP Server Management',
                         rawCode: `@Server Configuration
 Install-WindowsFeature DHCP -IncludeManagementTools # Install role
 Add-DhcpServerInDC -DnsName lon-svr1.adatum.com -IPAddress 172.16.0.21 # Authorize in AD
@@ -740,8 +752,8 @@ Add-DhcpServerv4Reservation -ScopeId 172.18.0.0 -ClientId 00-f0-c4-55-44-33 -IPA
 Set-DhcpServerv4OptionValue -ReservedIP 172.18.0.60 -Router 172.18.0.30 # Specific reservation option`
                     },
                     {
-                        id: 'gpo-dfs',
-                        title: 'Exercise 6: GPO & DFS (Group Policies)',
+                        id: 'gpo-',
+                        title: 'se 6: GPO &  (Group Policies)',
                         rawCode: `@Basic GPO Management
 New-GPO -Name "cmd" # Create a new GPO
 New-GPLink -Name "cmd" -Target "ou=tri,dc=ntic,dc=ma" -LinkEnabled Yes # Link GPO to an OU
@@ -810,10 +822,7 @@ New-GPLink -Name "GPO_software" -Target "ou=TRI,dc=ntic,dc=ma" # Link to OU`
 
                 const parseCode = (raw) => raw.split('\n');
 
-                /*
-                   SYNTAX HIGHLIGHTING ENGINE (PowerShell Edition)
-                   Corresponds to /src/composables/useSyntaxHighlighter.js
-                */
+                /* SYNTAX HIGHLIGHTING ENGINE */
                 const highlightLine = (line) => {
                     if (!line) return '<span class="text-transparent">.</span>'; 
                     const trimmed = line.trim();
@@ -821,7 +830,7 @@ New-GPLink -Name "GPO_software" -Target "ou=TRI,dc=ntic,dc=ma" # Link to OU`
                     // Headers
                     if (trimmed.startsWith('@')) {
                         const content = trimmed.substring(1);
-                        return `<span class="syntax-header"><i class="ph-bold ph-hash text-sky-400"></i> ${content}</span>`;
+                        return `<span class="syntax-header"><i class="ph-bold ph-hash text-indigo-400"></i> ${content}</span>`;
                     }
 
                     // Pure Comments
@@ -854,7 +863,7 @@ New-GPLink -Name "GPO_software" -Target "ou=TRI,dc=ntic,dc=ma" # Link to OU`
                         return `__R${replacements.length - 1}__`;
                     };
 
-                    // 1. Strings (Highest priority to avoid highlighting keywords inside strings)
+                    // 1. Strings (Highest priority)
                     codePart = codePart.replace(/(["'])(?:(?=(\\?))\2.)*?\1/g, (match) => {
                         return pushReplacement(`<span class="syntax-string">${match}</span>`);
                     });
@@ -864,17 +873,20 @@ New-GPLink -Name "GPO_software" -Target "ou=TRI,dc=ntic,dc=ma" # Link to OU`
                         return pushReplacement(`<span class="syntax-variable">${match}</span>`);
                     });
 
-                    // 3. Parameters (-Name, -Force, -Confirm:$false)
-                    codePart = codePart.replace(/\s(-[a-zA-Z]+)(?::\$[a-z]+)?/g, (match, p1) => {
-                         // We keep the whitespace in the match to ensure we don't catch hyphens in middle of words
-                         // But we want to highlight just the parameter part
-                         return match.replace(p1, pushReplacement(`<span class="syntax-param">${p1}</span>`));
+                    // 3. Parameters (Updated to hide as inputs in Challenge mode)
+                    // Added support for /arguments (legacy style)
+                    codePart = codePart.replace(/\s([-\/][a-zA-Z0-9]+)(?::\$[a-z]+)?/g, (match, p1) => {
+                         if (viewMode.value === 'challenge') {
+                             const width = Math.max(p1.length, 5);
+                             const inputHtml = `<input type="text" class="challenge-input" data-answer="${p1}" style="width: ${width}ch" spellcheck="false" autocomplete="off">`;
+                             return match.replace(p1, pushReplacement(inputHtml));
+                         } else {
+                             return match.replace(p1, pushReplacement(`<span class="syntax-param">${p1}</span>`));
+                         }
                     });
 
-                    // 4. Cmdlets (Verb-Noun) - The Core Logic
-                    // Regex looks for PascalCase-PascalCase pattern common in PS
-                    const cmdletRegex = /\b([A-Z][a-zA-Z]+-[A-Z][a-zA-Z]+)\b/g;
-                    
+                    // 4. Cmdlets (Refined Regex for Case-Insensitive Verb-Noun)
+                    const cmdletRegex = /\b[a-zA-Z]+-[a-zA-Z]+\b/g;
                     codePart = codePart.replace(cmdletRegex, (match) => {
                         if (viewMode.value === 'challenge') {
                             const width = Math.max(match.length, 10);
@@ -885,13 +897,31 @@ New-GPLink -Name "GPO_software" -Target "ou=TRI,dc=ntic,dc=ma" # Link to OU`
                         }
                     });
 
-                    // 5. Special Executables (exe/dll)
+                    // 5. Standalone Tools (Explicit List)
+                    const tools = [
+                        "gpupdate", "regsvr32", "hostname", "ping", "ipconfig", "net", 
+                        "redircmp", "redirusr", "nslookup", "tree", "whoami"
+                    ];
+                    // Regex looks for tool names boundary-delimited
+                    const toolsRegex = new RegExp(`\\b(${tools.join('|')})\\b`, 'gi');
+                    
+                    codePart = codePart.replace(toolsRegex, (match) => {
+                        if (viewMode.value === 'challenge') {
+                            const width = Math.max(match.length, 10);
+                            return pushReplacement(`<input type="text" class="challenge-input" data-answer="${match}" style="width: ${width}ch" spellcheck="false" autocomplete="off">`);
+                        } else {
+                            const blurClass = viewMode.value === 'data' ? 'blur-content' : '';
+                            return pushReplacement(`<span class="syntax-cmdlet text-pink-400 ${blurClass}">${match}</span>`);
+                        }
+                    });
+
+                    // 6. Special Executables (exe/dll)
                     const exeRegex = /\b([a-zA-Z0-9]+\.(exe|dll))\b/g;
                     codePart = codePart.replace(exeRegex, (match) => {
                          if (viewMode.value === 'challenge') {
-                             return pushReplacement(`<input type="text" class="challenge-input" data-answer="${match}" style="width: ${match.length}ch">`);
+                             return pushReplacement(`<input type="text" class="challenge-input" data-answer="${match}" style="width: ${match.length}ch" spellcheck="false" autocomplete="off">`);
                          }
-                         return pushReplacement(`<span class="syntax-cmdlet text-sky-300">${match}</span>`);
+                         return pushReplacement(`<span class="syntax-cmdlet text-indigo-300">${match}</span>`);
                     });
 
                     // Restore replacements
@@ -909,13 +939,22 @@ New-GPLink -Name "GPO_software" -Target "ou=TRI,dc=ntic,dc=ma" # Link to OU`
                     return `<span class="text-slate-200 font-medium ${codeBlurClass}">${codePart}</span>${commentPart}`;
                 };
 
+                const updateProgress = () => {
+                    nextTick(() => {
+                        if (viewMode.value === 'challenge') {
+                            const inputs = document.querySelectorAll('.challenge-input');
+                            challengeProgress.value.total = inputs.length;
+                            challengeProgress.value.correct = document.querySelectorAll('.challenge-input.correct').length;
+                        }
+                    });
+                };
+
                 const handleChallengeInput = (e) => {
                     if (e.target && e.target.classList.contains('challenge-input')) {
                         const input = e.target;
                         const answer = input.dataset.answer;
                         const value = input.value;
 
-                        // Case-insensitive check for PowerShell
                         if (value.toLowerCase() === answer.toLowerCase()) {
                             input.classList.add('correct');
                             input.classList.remove('incorrect');
@@ -928,6 +967,7 @@ New-GPLink -Name "GPO_software" -Target "ou=TRI,dc=ntic,dc=ma" # Link to OU`
                             input.classList.remove('incorrect');
                             input.classList.remove('correct');
                         }
+                        updateProgress();
                     }
                 };
 
@@ -992,7 +1032,8 @@ New-GPLink -Name "GPO_software" -Target "ou=TRI,dc=ntic,dc=ma" # Link to OU`
                     language,
                     t,
                     toggleLanguage,
-                    handleChallengeInput
+                    handleChallengeInput,
+                    challengeProgress
                 };
             }
         }).mount('#app');
