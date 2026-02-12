@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,15 +18,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 
     <style>
-        /* PROJECT STRUCTURE NOTE:
-           In a production Vue CLI/Vite environment, split this file as follows:
-           - /src/assets/base.css (The CSS below)
-           - /src/App.vue (The HTML Layout and Script)
-           - /src/data/powershell-data.js (The sectionsData array)
-        */
-
-        body { font-family: 'Outfit', sans-serif; background-color: #030712; }
-        .code-font { font-family: 'JetBrains Mono', monospace; }
+        body { 
+            font-family: 'Outfit', sans-serif; 
+            background-color: #030712; 
+            color: #e2e8f0;
+        }
+        
+        .code-font { 
+            font-family: 'JetBrains Mono', monospace; 
+        }
         
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -36,11 +36,11 @@
 
         /* Advanced Blur Effects for Learning Modes */
         .blur-content {
-            filter: blur(8px);
+            filter: blur(6px);
             opacity: 0.4;
             user-select: none;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            background: rgba(0,0,0,0.2);
+            background: rgba(255,255,255,0.05);
             border-radius: 4px;
         }
         .blur-content:hover {
@@ -49,29 +49,39 @@
             background: transparent;
         }
 
-        /* PowerShell Syntax Highlighting Palette - Matching CCNA Theme */
-        .syntax-cmdlet  { color: #38bdf8; font-weight: 600; } /* Blue: Get-Item */
-        .syntax-param   { color: #c084fc; font-weight: 700; } /* Purple: -Name */
-        .syntax-variable{ color: #fbbf24; } /* Amber: $var */
-        .syntax-string  { color: #4ade80; } /* Green: "String" */
-        .syntax-value   { color: #4ade80; } /* Green: IPs, Numbers */
-        .syntax-header  { color: #818cf8; font-weight: 800; letter-spacing: 0.05em; border-bottom: 1px solid rgba(129, 140, 248, 0.3); padding-bottom: 4px; display: inline-block; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+        /* PowerShell Syntax Highlighting Palette */
+        .syntax-cmdlet  { color: #38bdf8; font-weight: 600; } /* Sky 400 */
+        .syntax-param   { color: #c084fc; font-weight: 700; } /* Purple 400 */
+        .syntax-variable{ color: #fbbf24; } /* Amber 400 */
+        .syntax-string  { color: #4ade80; } /* Green 400 */
+        .syntax-value   { color: #a7f3d0; } /* Emerald 200 */
+        .syntax-header  { 
+            color: #818cf8; 
+            font-weight: 800; 
+            letter-spacing: 0.05em; 
+            border-bottom: 1px solid rgba(129, 140, 248, 0.3); 
+            padding-bottom: 4px; 
+            display: inline-block; 
+            margin-top: 1.5rem; 
+            margin-bottom: 0.5rem; 
+        }
 
         /* Challenge Mode Inputs */
         .challenge-input {
-            font-family: inherit;
+            font-family: 'JetBrains Mono', monospace;
             background: rgba(255, 255, 255, 0.05);
             border: none;
             border-bottom: 2px solid #6366f1;
             color: #e2e8f0;
             text-align: center;
-            padding: 0 2px;
+            padding: 0 4px;
             margin: 0 2px;
             border-radius: 4px 4px 0 0;
             outline: none;
             transition: all 0.2s ease;
             display: inline-block;
             min-width: 30px;
+            height: 1.5em;
         }
         .challenge-input:focus {
             background: rgba(99, 102, 241, 0.2);
@@ -80,7 +90,7 @@
         .challenge-input.correct {
             color: #34d399; /* Emerald 400 */
             border-bottom: 2px solid transparent;
-            background: transparent;
+            background: rgba(52, 211, 153, 0.1);
             font-weight: bold;
         }
         .challenge-input.incorrect {
@@ -89,7 +99,7 @@
             background: rgba(248, 113, 113, 0.1);
         }
 
-        /* Glassmorphism Background */
+        /* Glassmorphism Panel */
         .glass-panel {
             background: rgba(17, 24, 39, 0.7);
             backdrop-filter: blur(20px);
@@ -102,8 +112,9 @@
             top: 0; left: 0; right: 0; bottom: 0;
             z-index: -1;
             background: 
-                radial-gradient(circle at 15% 50%, rgba(79, 70, 229, 0.15), transparent 25%),
-                radial-gradient(circle at 85% 30%, rgba(147, 51, 234, 0.15), transparent 25%);
+                radial-gradient(circle at 15% 50%, rgba(79, 70, 229, 0.1), transparent 40%),
+                radial-gradient(circle at 85% 30%, rgba(147, 51, 234, 0.1), transparent 40%);
+            background-color: #030712;
         }
 
         @keyframes slideUp {
@@ -113,18 +124,22 @@
         .animate-slide-up { animation: slideUp 0.4s ease-out forwards; }
     </style>
 </head>
-<body class="text-slate-200 h-screen flex flex-col overflow-hidden selection:bg-indigo-500/30">
+<body class="h-screen flex flex-col overflow-hidden selection:bg-indigo-500/30">
 
     <div class="mesh-bg"></div>
 
-    <div id="app" class="h-full flex flex-col md:flex-row">
+    <div id="app" class="h-full flex flex-col md:flex-row relative">
         
         <!-- Mobile Menu Overlay -->
         <div v-if="mobileMenuOpen" class="fixed inset-0 bg-black/80 backdrop-blur-md z-40 md:hidden" @click="mobileMenuOpen = false"></div>
 
         <!-- Sidebar Navigation -->
-        <aside :class="['fixed md:static inset-y-0 left-0 z-50 w-80 glass-panel border-r-0 border-r border-white/5 flex flex-col flex-shrink-0 transition-transform duration-300 shadow-2xl z-50', mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0']">
-            <div class="p-6 border-b border-white/5 flex justify-between items-center bg-gradient-to-b from-white/5 to-transparent">
+        <aside :class="[
+            'fixed md:static inset-y-0 left-0 z-50 glass-panel border-r border-white/5 flex flex-col flex-shrink-0 transition-all duration-300 shadow-2xl overflow-hidden', 
+            mobileMenuOpen ? 'translate-x-0 w-80' : '-translate-x-full w-80',
+            sidebarOpen ? 'md:translate-x-0 md:w-80 md:opacity-100' : 'md:translate-x-0 md:w-0 md:opacity-0 md:border-r-0'
+        ]">
+            <div class="p-6 border-b border-white/5 flex justify-between items-center bg-gradient-to-b from-white/5 to-transparent min-w-[20rem]">
                 <div>
                     <h1 class="text-xl font-bold text-white tracking-tight flex items-center gap-2">
                         <i class="ph-duotone ph-terminal-window text-indigo-400 text-3xl"></i>
@@ -132,17 +147,22 @@
                     </h1>
                     <span class="text-[10px] text-slate-500 font-mono pl-10 block -mt-1">SERVER ADMIN EDITION</span>
                 </div>
+                <!-- Mobile Close -->
                 <button @click="mobileMenuOpen = false" class="md:hidden text-slate-400 hover:text-white"><i class="ph ph-x text-xl"></i></button>
+                <!-- Desktop Collapse -->
+                <button @click="sidebarOpen = false" class="hidden md:block text-slate-500 hover:text-white transition-colors" title="Collapse Sidebar">
+                    <i class="ph-bold ph-caret-double-left text-lg"></i>
+                </button>
             </div>
 
             <!-- Search -->
-            <div class="p-4 border-b border-white/5">
+            <div class="p-4 border-b border-white/5 min-w-[20rem]">
                 <div class="relative group">
                     <input 
                         ref="searchInput"
                         v-model="searchQuery" 
                         type="text" 
-                        :placeholder="t.searchPlaceholder" 
+                        :placeholder="t.searchPlaceholder"
                         class="w-full bg-black/30 border border-white/10 text-slate-200 text-sm rounded-xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 block p-3 pl-10 placeholder-slate-500 transition-all group-hover:border-white/20 shadow-inner"
                     >
                     <i class="ph ph-magnifying-glass text-slate-500 absolute left-3 top-3.5 group-focus-within:text-indigo-400 transition-colors"></i>
@@ -153,7 +173,7 @@
             </div>
 
             <!-- Navigation Links -->
-            <nav class="flex-1 overflow-y-auto p-3 space-y-6">
+            <nav class="flex-1 overflow-y-auto p-3 space-y-6 min-w-[20rem]">
                 
                 <!-- Favorites Section -->
                 <div v-if="pinnedSections.length > 0" class="animate-slide-up">
@@ -195,7 +215,12 @@
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 overflow-y-auto relative scroll-smooth" id="main-content" @scroll="handleScroll" @input="handleChallengeInput">
+        <main 
+            class="flex-1 overflow-y-auto relative scroll-smooth" 
+            id="main-content" 
+            @scroll="handleScroll"
+            @input="handleChallengeInput"
+        >
             
             <!-- Mobile Header -->
             <div class="md:hidden p-4 glass-panel border-b border-white/5 flex justify-between items-center sticky top-0 z-30">
@@ -207,12 +232,21 @@
             <div class="max-w-6xl mx-auto p-4 md:p-8 space-y-8 pb-32">
                 
                 <!-- Dashboard / Tools -->
-                <div class="glass-panel p-1 rounded-2xl sticky md:static top-2 z-20 shadow-2xl mx-auto max-w-4xl ring-1 ring-white/10">
+                <div class="glass-panel p-1 rounded-2xl sticky top-2 md:top-6 z-40 shadow-2xl mx-auto max-w-4xl ring-1 ring-white/10 transition-all">
                     <div class="bg-black/40 rounded-xl p-4 flex flex-col md:flex-row justify-between items-center gap-4">
                         
                         <!-- Mode Selector -->
                         <div class="flex items-center gap-4 w-full md:w-auto">
-                            <div class="flex bg-black/50 p-1 rounded-lg border border-white/5 w-full md:w-auto overflow-x-auto">
+                            <!-- Desktop Sidebar Toggle -->
+                            <button 
+                                @click="sidebarOpen = !sidebarOpen" 
+                                class="hidden md:flex items-center justify-center w-10 h-10 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors mr-2 border border-transparent hover:border-white/10"
+                                :title="sidebarOpen ? 'Close Sidebar' : 'Open Sidebar'"
+                            >
+                                <i class="ph-fill text-xl" :class="sidebarOpen ? 'ph-sidebar-simple' : 'ph-list'"></i>
+                            </button>
+
+                            <div class="flex bg-black/50 p-1 rounded-lg border border-white/5 w-full md:w-auto overflow-x-auto no-scrollbar">
                                 <button 
                                     @click="viewMode = 'standard'"
                                     :class="['flex-1 px-4 py-2 rounded-md text-xs font-bold uppercase tracking-wide transition-all flex items-center justify-center gap-2 min-w-[90px]', viewMode === 'standard' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300']"
@@ -231,7 +265,7 @@
                                     :class="['flex-1 px-4 py-2 rounded-md text-xs font-bold uppercase tracking-wide transition-all flex items-center justify-center gap-2 min-w-[90px]', viewMode === 'recall' ? 'bg-emerald-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300']"
                                     :title="t.recallTooltip"
                                 >
-                                    <i class="ph-bold ph-code"></i> {{ t.recall }}
+                                    <i class="ph-bold ph-brain"></i> {{ t.recall }}
                                 </button>
                                 <button 
                                     @click="viewMode = 'challenge'"
@@ -240,18 +274,11 @@
                                 >
                                     <i class="ph-bold ph-target"></i> {{ t.challenge }}
                                 </button>
-                                <button 
-                                    @click="viewMode = 'data'"
-                                    :class="['flex-1 px-4 py-2 rounded-md text-xs font-bold uppercase tracking-wide transition-all flex items-center justify-center gap-2 min-w-[90px]', viewMode === 'data' ? 'bg-orange-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300']"
-                                    :title="t.dataTooltip"
-                                >
-                                    <i class="ph-bold ph-database"></i> {{ t.data }}
-                                </button>
                             </div>
 
                             <!-- Progress Indicator (Challenge Mode Only) -->
-                            <div v-if="viewMode === 'challenge'" class="hidden md:flex flex-col items-end animate-slide-up">
-                                <span class="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Progress</span>
+                            <div v-if="viewMode === 'challenge'" class="hidden md:flex flex-col items-end animate-slide-up pl-4 border-l border-white/10">
+                                <span class="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Score</span>
                                 <div class="flex items-baseline gap-1">
                                     <span class="text-xl font-bold text-pink-400">{{ challengeProgress.correct }}</span>
                                     <span class="text-xs text-slate-600">/ {{ challengeProgress.total }}</span>
@@ -260,16 +287,16 @@
                         </div>
                         
                         <!-- Language Toggle -->
-                        <div class="flex items-center gap-2 bg-black/50 p-1 rounded-lg border border-white/5">
+                        <div class="flex items-center gap-2 bg-black/50 p-1 rounded-lg border border-white/5 ml-auto">
                             <button 
                                 @click="toggleLanguage('fr')"
-                                :class="['px-3 py-1.5 rounded text-xs font-bold transition-all', language === 'fr' ? 'bg-indigo-500/20 text-indigo-300' : 'text-slate-500 hover:text-slate-300']"
+                                :class="['px-3 py-1.5 rounded text-xs font-bold transition-all', language === 'fr' ? 'bg-indigo-500/20 text-indigo-300 shadow-sm' : 'text-slate-500 hover:text-slate-300']"
                             >
                                 FR
                             </button>
                             <button 
                                 @click="toggleLanguage('en')"
-                                :class="['px-3 py-1.5 rounded text-xs font-bold transition-all', language === 'en' ? 'bg-indigo-500/20 text-indigo-300' : 'text-slate-500 hover:text-slate-300']"
+                                :class="['px-3 py-1.5 rounded text-xs font-bold transition-all', language === 'en' ? 'bg-indigo-500/20 text-indigo-300 shadow-sm' : 'text-slate-500 hover:text-slate-300']"
                             >
                                 EN
                             </button>
@@ -283,20 +310,20 @@
                     v-for="(section, index) in filteredSections" 
                     :key="section.id" 
                     :id="section.id"
-                    class="scroll-mt-32 md:scroll-mt-8 animate-slide-up"
+                    class="scroll-mt-32 md:scroll-mt-32 animate-slide-up"
                     :style="{ animationDelay: `${index * 50}ms` }"
                 >
                     <div class="flex items-center justify-between mb-3 px-2">
                         <div class="flex items-center gap-3">
                             <h2 class="text-xl font-bold text-slate-100 tracking-tight flex items-center gap-2">
-                                <span class="text-indigo-400">PS></span> {{ section.title }}
+                                <span class="text-indigo-400 font-mono text-lg">PS></span> {{ section.title }}
                             </h2>
                             <button @click="togglePin(section.id)" class="text-slate-600 hover:text-yellow-400 transition-colors" :title="pinnedIds.includes(section.id) ? 'Unpin' : 'Pin to top'">
                                 <i :class="pinnedIds.includes(section.id) ? 'ph-fill ph-star text-yellow-400' : 'ph-bold ph-star'"></i>
                             </button>
                         </div>
                         <button 
-                            @click="copySection(section.rawCode)"
+                            @click="copySection(section.rawCode, section.id)"
                             class="text-xs flex items-center gap-2 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white px-3 py-1.5 rounded-lg border border-white/5 transition-all active:scale-95"
                         >
                             <i v-if="!copiedState[section.id]" class="ph-bold ph-copy"></i>
@@ -320,7 +347,7 @@
                             </div>
                         </div>
 
-                        <div class="p-5 overflow-x-auto bg-[#0c0a1f]/80">
+                        <div class="p-5 overflow-x-auto bg-[#0c0a1f]/80 min-h-[100px]">
                             <div class="code-font text-xs md:text-sm leading-7 min-w-[600px] md:min-w-0">
                                 <template v-for="(line, idx) in parseCode(section.rawCode)" :key="idx">
                                     <div class="group/line table-row hover:bg-white/5 transition-colors w-full duration-75">
@@ -339,7 +366,7 @@
                 </div>
 
                 <footer class="border-t border-white/10 pt-10 mt-12 pb-10 text-center">
-                    <p class="text-slate-600 text-xs font-mono tracking-widest uppercase">
+                    <p class="text-slate-600 text-xs font-mono tracking-widest uppercase opacity-50">
                         {{ t.footerQuote }}
                     </p>
                 </footer>
@@ -368,6 +395,7 @@
                 const activeSection = ref('');
                 const copiedState = ref({});
                 const mobileMenuOpen = ref(false);
+                const sidebarOpen = ref(true); // New state for desktop sidebar
                 const toast = ref({ show: false });
                 const challengeProgress = ref({ total: 0, correct: 0 });
                 
@@ -376,7 +404,7 @@
                 const pinnedIds = ref(JSON.parse(localStorage.getItem('ps_pinned_ids') || '[]'));
                 const language = ref(localStorage.getItem('ps_language') || 'fr');
 
-                // Watchers for persistence
+                // Watchers
                 watch(viewMode, (newVal) => {
                     localStorage.setItem('ps_view_mode', newVal);
                     updateProgress();
@@ -394,15 +422,13 @@
                         explain: 'Explain',
                         recall: 'Recall',
                         challenge: 'Challenge',
-                        data: 'Values',
-                        explainTooltip: 'Hides comments, keeps code',
-                        recallTooltip: 'Hides code, keeps comments',
-                        challengeTooltip: 'Fill in the Cmdlets',
-                        dataTooltip: 'Hides syntax, keeps values',
+                        explainTooltip: 'Blurs code, highlights comments',
+                        recallTooltip: 'Blurs comments, highlights code',
+                        challengeTooltip: 'Test your knowledge',
                         copy: 'Script',
                         copied: 'Copied',
                         footerQuote: 'Automation is Power',
-                        toastCopied: 'Script copied to clipboard'
+                        toastCopied: 'Clean script copied to clipboard'
                     },
                     fr: {
                         searchPlaceholder: 'Rechercher Cmdlet...',
@@ -412,11 +438,9 @@
                         explain: 'Expliquer',
                         recall: 'Rappel',
                         challenge: 'Défi',
-                        data: 'Données',
-                        explainTooltip: 'Cache les commentaires',
-                        recallTooltip: 'Cache le code',
+                        explainTooltip: 'Cache le code',
+                        recallTooltip: 'Cache les commentaires',
                         challengeTooltip: 'Remplir les commandes',
-                        dataTooltip: 'Cache la syntaxe',
                         copy: 'Script',
                         copied: 'Copié',
                         footerQuote: 'L\'automatisation est le pouvoir',
@@ -435,7 +459,7 @@
                     document.addEventListener('keydown', (e) => {
                         if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
                             e.preventDefault();
-                            searchInput.value.focus();
+                            if(searchInput.value) searchInput.value.focus();
                         }
                     });
                     updateProgress();
@@ -445,7 +469,7 @@
                 const sectionsDataFr = [
                     {
                         id: 'basic-config',
-                        title: ' 1 : Configuration de base',
+                        title: 'Configuration de base',
                         rawCode: `@Gestion de l'alimentation
 Restart-Computer # Redémarrer le serveur
 Stop-Computer # Arrêter le serveur
@@ -469,7 +493,7 @@ Get-WindowsFeature -Name *GUI* | Remove-WindowsFeature -Restart`
                     },
                     {
                         id: 'adds-install',
-                        title: ' 2 : Installation Contrôleur de Domaine',
+                        title: 'Installation Contrôleur de Domaine',
                         rawCode: `@Installation Rôle
 Install-WindowsFeature -Name AD-Domain-Services -IncludeAllSubFeature -IncludeManagementTools # Installer les binaires ADDS
 
@@ -489,7 +513,7 @@ regsvr32 -u schmmgmt.dll # Désinscrire la console schéma`
                     },
                     {
                         id: 'ad-objects',
-                        title: ' 3 : Gestion des Objets ADDS',
+                        title: 'Gestion des Objets ADDS',
                         rawCode: `@Unités Organisationnelles (OU)
 New-ADOrganizationalUnit -Name NTIC # Créer une OU racine
 New-ADOrganizationalUnit -Name TRI -Path "ou=ntic,dc=adatum,dc=com" # Créer sous-OU
@@ -533,7 +557,7 @@ Move-ADObject "cn=TRI3,ou=TRI,ou=NTIC,dc=adatum,dc=com" -TargetPath "ou=NTIC,dc=
                     },
                     {
                         id: 'dns-server',
-                        title: ' 4 : Gestion de Serveur DNS',
+                        title: 'Gestion de Serveur DNS',
                         rawCode: `@Zones DNS
 Install-WindowsFeature DNS -IncludeManagementTools # Installer rôle
 Add-DnsServerPrimaryZone -Name ofppt.ma -ZoneFile ofppt.ma.dns -DynamicUpdate NonsecureAndSecure # Standard primary zone
@@ -556,7 +580,7 @@ Add-DnsServerStubZone -Name adatum.com -MasterServers 172.16.0.10 -ZoneFile adat
                     },
                     {
                         id: 'dhcp-server',
-                        title: ' 5 : Gestion de Serveur DHCP',
+                        title: 'Gestion de Serveur DHCP',
                         rawCode: `@Configuration Serveur
 Install-WindowsFeature DHCP -IncludeManagementTools # Installer rôle
 Add-DhcpServerInDC -DnsName lon-svr1.adatum.com -IPAddress 172.16.0.21 # Autoriser dans AD
@@ -569,22 +593,22 @@ Add-DhcpServerv4ExclusionRange -ScopeId 172.18.0.0 -StartRange 172.18.0.70 -EndR
 @Options DHCP
 Set-DhcpServerv4OptionValue -ScopeId 172.18.0.0 -Router 172.18.0.1 # Passerelle (Option 003)
 Set-DhcpServerv4OptionValue -ScopeId 172.18.0.0 -DnsServer 172.18.0.10 # DNS (Option 006)
-Set-DhcpServerv4OptionValue -ComputerName lon-svr1.adatum.com -OptionId 3 -Value 172.18.0.10 # Option niveau serveur
+Set-DhcpServerv4OptionValue -ComputerName lon-svr1.adatum.com -OptionId 3 -Value 172.18.0.10 # Server level option
 
-@Réservations
+@Reservations
 Add-DhcpServerv4Reservation -ScopeId 172.18.0.0 -ClientId 00-f0-c4-55-44-33 -IPAddress 172.18.0.60 # Créer réservation MAC
-Set-DhcpServerv4OptionValue -ReservedIP 172.18.0.60 -Router 172.18.0.30 # Option spécifique réservation`
+Set-DhcpServerv4OptionValue -ReservedIP 172.18.0.60 -Router 172.18.0.30 # Specific reservation option`
                     },
                     {
-                        id: 'gpo-',
-                        title: ' 6 : GPO  (Stratégies de Groupe)',
-                        rawCode: `@Gestion de base des GPO
+                        id: 'gpo',
+                        title: 'GPO (Stratégies de Groupe)',
+                        rawCode: `@Basic GPO Management
 New-GPO -Name "cmd" # Créer une nouvelle GPO
 New-GPLink -Name "cmd" -Target "ou=tri,dc=ntic,dc=ma" -LinkEnabled Yes # Lier la GPO à une OU
-Rename-GPO -Name "ancien nom" -TargetName "nouveau nom" # Renommer une GPO
-Remove-GPLink -Name "NomGPO" -Target "dn" # Supprimer un lien
-Remove-GPO -Name "NomGPO" # Supprimer définitivement une GPO
-gpupdate /force # Forcer la mise à jour des stratégies
+Rename-GPO -Name "ancien nom" -TargetName "nouveau nom" # Rename a GPO
+Remove-GPLink -Name "NomGPO" -Target "dn" # Remove a link
+Remove-GPO -Name "NomGPO" # Permanently delete a GPO
+gpupdate /force # Force policy update
 
 @Redirection de Dossiers & Scripts
 New-Item -Path "C:\\Redirect" -ItemType Directory # Créer le dossier de redirection
@@ -621,7 +645,7 @@ New-GPLink -Name "GPO_software" -Target "ou=TRI,dc=ntic,dc=ma" # Lier à l'OU`
                 const sectionsDataEn = [
                     {
                         id: 'basic-config',
-                        title: ' 1: Basic Configuration',
+                        title: 'Basic Configuration',
                         rawCode: `@Power Management
 Restart-Computer # Restart the server
 Stop-Computer # Stop the server
@@ -645,7 +669,7 @@ Get-WindowsFeature -Name *GUI* | Remove-WindowsFeature -Restart`
                     },
                     {
                         id: 'adds-install',
-                        title: ' 2: Domain Controller Installation',
+                        title: 'Domain Controller Installation',
                         rawCode: `@Role Installation
 Install-WindowsFeature -Name AD-Domain-Services -IncludeAllSubFeature -IncludeManagementTools # Install ADDS binaries
 
@@ -665,7 +689,7 @@ regsvr32 -u schmmgmt.dll # Unregister schema console`
                     },
                     {
                         id: 'ad-objects',
-                        title: ' 3: ADDS Object Management',
+                        title: 'ADDS Object Management',
                         rawCode: `@Organizational Units (OU)
 New-ADOrganizationalUnit -Name NTIC # Create root OU
 New-ADOrganizationalUnit -Name TRI -Path "ou=ntic,dc=adatum,dc=com" # Create sub-OU
@@ -709,7 +733,7 @@ Move-ADObject "cn=TRI3,ou=TRI,ou=NTIC,dc=adatum,dc=com" -TargetPath "ou=NTIC,dc=
                     },
                     {
                         id: 'dns-server',
-                        title: ' 4: DNS Server Management',
+                        title: 'DNS Server Management',
                         rawCode: `@DNS Zones
 Install-WindowsFeature DNS -IncludeManagementTools # Install role
 Add-DnsServerPrimaryZone -Name ofppt.ma -ZoneFile ofppt.ma.dns -DynamicUpdate NonsecureAndSecure # Standard primary zone
@@ -732,7 +756,7 @@ Add-DnsServerStubZone -Name adatum.com -MasterServers 172.16.0.10 -ZoneFile adat
                     },
                     {
                         id: 'dhcp-server',
-                        title: ' 5: DHCP Server Management',
+                        title: 'DHCP Server Management',
                         rawCode: `@Server Configuration
 Install-WindowsFeature DHCP -IncludeManagementTools # Install role
 Add-DhcpServerInDC -DnsName lon-svr1.adatum.com -IPAddress 172.16.0.21 # Authorize in AD
@@ -752,8 +776,8 @@ Add-DhcpServerv4Reservation -ScopeId 172.18.0.0 -ClientId 00-f0-c4-55-44-33 -IPA
 Set-DhcpServerv4OptionValue -ReservedIP 172.18.0.60 -Router 172.18.0.30 # Specific reservation option`
                     },
                     {
-                        id: 'gpo-',
-                        title: ' 6: GPO &  (Group Policies)',
+                        id: 'gpo',
+                        title: 'GPO (Group Policies)',
                         rawCode: `@Basic GPO Management
 New-GPO -Name "cmd" # Create a new GPO
 New-GPLink -Name "cmd" -Target "ou=tri,dc=ntic,dc=ma" -LinkEnabled Yes # Link GPO to an OU
@@ -834,9 +858,9 @@ New-GPLink -Name "GPO_software" -Target "ou=TRI,dc=ntic,dc=ma" # Link to OU`
                     }
 
                     // Pure Comments
-                    if (trimmed.startsWith('#')) { 
-                         const blurClass = viewMode.value === 'explain' ? 'blur-content' : '';
-                         return `<span class="italic text-slate-500 ${blurClass}">${line}</span>`;
+                    if (trimmed.startsWith('#')) {  
+                        const blurClass = viewMode.value === 'explain' ? 'blur-content' : '';
+                        return `<span class="italic text-slate-500 ${blurClass}">${line}</span>`;
                     }
 
                     // Code + Comments
@@ -874,10 +898,10 @@ New-GPLink -Name "GPO_software" -Target "ou=TRI,dc=ntic,dc=ma" # Link to OU`
                     });
 
                     // 3. Parameters (Updated to hide as inputs in Challenge mode)
-                    // Added support for /arguments (legacy style)
-                    codePart = codePart.replace(/\s([-\/][a-zA-Z0-9]+)(?::\$[a-z]+)?/g, (match, p1) => {
+                    codePart = codePart.replace(/\s([-\/][a-zA-Z0-9]+)(?::\$[a-z]+)?/g, (match, p1) => { 
                          if (viewMode.value === 'challenge') {
                              const width = Math.max(p1.length, 5);
+                             // We ensure the input knows the correct answer via data-answer
                              const inputHtml = `<input type="text" class="challenge-input" data-answer="${p1}" style="width: ${width}ch" spellcheck="false" autocomplete="off">`;
                              return match.replace(p1, pushReplacement(inputHtml));
                          } else {
@@ -917,7 +941,7 @@ New-GPLink -Name "GPO_software" -Target "ou=TRI,dc=ntic,dc=ma" # Link to OU`
 
                     // 6. Special Executables (exe/dll)
                     const exeRegex = /\b([a-zA-Z0-9]+\.(exe|dll))\b/g;
-                    codePart = codePart.replace(exeRegex, (match) => {
+                    codePart = codePart.replace(exeRegex, (match) => { 
                          if (viewMode.value === 'challenge') {
                              return pushReplacement(`<input type="text" class="challenge-input" data-answer="${match}" style="width: ${match.length}ch" spellcheck="false" autocomplete="off">`);
                          }
@@ -925,7 +949,7 @@ New-GPLink -Name "GPO_software" -Target "ou=TRI,dc=ntic,dc=ma" # Link to OU`
                     });
 
                     // Restore replacements
-                    replacements.forEach((html, i) => {
+                    replacements.forEach((html, i) => { 
                          codePart = codePart.replace(`__R${i}__`, html);
                     });
 
@@ -960,7 +984,7 @@ New-GPLink -Name "GPO_software" -Target "ou=TRI,dc=ntic,dc=ma" # Link to OU`
                             input.classList.remove('incorrect');
                             input.setAttribute('readonly', true);
                             input.blur(); 
-                        } else if (value.length >= answer.length) {
+                        } else if (value.length >= answer.length) { 
                              input.classList.add('incorrect');
                              input.classList.remove('correct');
                         } else {
@@ -989,8 +1013,7 @@ New-GPLink -Name "GPO_software" -Target "ou=TRI,dc=ntic,dc=ma" # Link to OU`
                     }
                 };
 
-                const copySection = (text) => {
-                    const sectionId = filteredSections.value.find(s => s.rawCode === text)?.id;
+                const copySection = (text, sectionId) => {
                     const cleanText = text
                         .split('\n')
                         .filter(line => !line.trim().startsWith('@') && !line.trim().startsWith('#'))
@@ -1033,7 +1056,8 @@ New-GPLink -Name "GPO_software" -Target "ou=TRI,dc=ntic,dc=ma" # Link to OU`
                     t,
                     toggleLanguage,
                     handleChallengeInput,
-                    challengeProgress
+                    challengeProgress,
+                    sidebarOpen
                 };
             }
         }).mount('#app');
