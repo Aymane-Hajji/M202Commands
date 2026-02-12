@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -434,7 +432,7 @@
                 const sectionsDataFr = [
                     {
                         id: 'basic-config',
-                        title: ' 1 : Configuration de base',
+                        title: 'Exercice 1 : Configuration de base',
                         rawCode: `@Gestion de l'alimentation
 Restart-Computer # Redémarrer le serveur
 Stop-Computer # Arrêter le serveur
@@ -458,7 +456,7 @@ Get-WindowsFeature -Name *GUI* | Remove-WindowsFeature -Restart`
                     },
                     {
                         id: 'adds-install',
-                        title: ' 2 : Installation Contrôleur de Domaine',
+                        title: 'Exercice 2 : Installation Contrôleur de Domaine',
                         rawCode: `@Installation Rôle
 Install-WindowsFeature -Name AD-Domain-Services -IncludeAllSubFeature -IncludeManagementTools # Installer les binaires ADDS
 
@@ -478,7 +476,7 @@ regsvr32 -u schmmgmt.dll # Désinscrire la console schéma`
                     },
                     {
                         id: 'ad-objects',
-                        title: ' 3 : Gestion des Objets ADDS',
+                        title: 'Exercice 3 : Gestion des Objets ADDS',
                         rawCode: `@Unités Organisationnelles (OU)
 New-ADOrganizationalUnit -Name NTIC # Créer une OU racine
 New-ADOrganizationalUnit -Name TRI -Path "ou=ntic,dc=adatum,dc=com" # Créer sous-OU
@@ -522,7 +520,7 @@ Move-ADObject "cn=TRI3,ou=TRI,ou=NTIC,dc=adatum,dc=com" -TargetPath "ou=NTIC,dc=
                     },
                     {
                         id: 'dns-server',
-                        title: ' 4 : Gestion de Serveur DNS',
+                        title: 'Exercice 4 : Gestion de Serveur DNS',
                         rawCode: `@Zones DNS
 Install-WindowsFeature DNS -IncludeManagementTools # Installer rôle
 Add-DnsServerPrimaryZone -Name ofppt.ma -ZoneFile ofppt.ma.dns -DynamicUpdate NonsecureAndSecure # Zone principale standard
@@ -545,7 +543,7 @@ Add-DnsServerStubZone -Name adatum.com -MasterServers 172.16.0.10 -ZoneFile adat
                     },
                     {
                         id: 'dhcp-server',
-                        title: ' 5 : Gestion de Serveur DHCP',
+                        title: 'Exercice 5 : Gestion de Serveur DHCP',
                         rawCode: `@Configuration Serveur
 Install-WindowsFeature DHCP -IncludeManagementTools # Installer rôle
 Add-DhcpServerInDC -DnsName lon-svr1.adatum.com -IPAddress 172.16.0.21 # Autoriser dans AD
@@ -565,8 +563,8 @@ Add-DhcpServerv4Reservation -ScopeId 172.18.0.0 -ClientId 00-f0-c4-55-44-33 -IPA
 Set-DhcpServerv4OptionValue -ReservedIP 172.18.0.60 -Router 172.18.0.30 # Option spécifique réservation`
                     },
                     {
-                        id: 'gpo',
-                        title: ' 6 : GPO  (Stratégies de Groupe)',
+                        id: 'gpo-dfs',
+                        title: 'Exercice 6 : GPO & DFS (Stratégies de Groupe)',
                         rawCode: `@Gestion de base des GPO
 New-GPO -Name "cmd" # Créer une nouvelle GPO
 New-GPLink -Name "cmd" -Target "ou=tri,dc=ntic,dc=ma" -LinkEnabled Yes # Lier la GPO à une OU
@@ -607,11 +605,182 @@ New-GPLink -Name "GPO_software" -Target "ou=TRI,dc=ntic,dc=ma" # Lier à l'OU`
                     }
                 ];
 
-                // English translation of the technical content for completeness/extensibility
-                const sectionsDataEn = sectionsDataFr.map(section => ({
-                    ...section,
-                    title: section.title.replace('', 'Exercise').replace('Gestion', 'Management')
-                }));
+                // English translation with full content localization
+                const sectionsDataEn = [
+                    {
+                        id: 'basic-config',
+                        title: 'Exercise 1: Basic Configuration',
+                        rawCode: `@Power Management
+Restart-Computer # Restart the server
+Stop-Computer # Stop the server
+
+@System Identity
+Rename-Computer -NewName "TRI-DC" -Restart # Rename computer and restart
+
+@IP Configuration
+Get-NetIPInterface # List interfaces
+New-NetIPAddress -InterfaceIndex 12 -IPAddress 172.16.0.200 -PrefixLength 24 -DefaultGateway 172.16.0.1 # Configure static IP address
+Set-DnsClientServerAddress -InterfaceIndex 12 -ServerAddresses ("172.16.0.10","172.16.0.11") # Configure DNS
+
+@Domain Join
+Add-Computer -DomainName Adatum.com -Restart # Join server to domain
+
+@Feature Management (GUI)
+# Convert Core to GUI (Full Installation)
+Get-WindowsFeature -Name *GUI* | Install-WindowsFeature -IncludeAllSubFeature -IncludeManagementTools -Restart
+# Convert GUI to Core (Minimal Installation)
+Get-WindowsFeature -Name *GUI* | Remove-WindowsFeature -Restart`
+                    },
+                    {
+                        id: 'adds-install',
+                        title: 'Exercise 2: Domain Controller Installation',
+                        rawCode: `@Role Installation
+Install-WindowsFeature -Name AD-Domain-Services -IncludeAllSubFeature -IncludeManagementTools # Install ADDS binaries
+
+@Controller Promotion
+# Add a DC to an existing domain
+Install-ADDSDomainController -DomainName Adatum.com -InstallDns
+# Add a new child domain
+Install-ADDSDomain -NewDomainName khenifra.adatum.com -ParentDomainName adatum.com -DomainType ChildDomain -InstallDns
+# Add a new tree
+Install-ADDSDomain -NewDomainName contoso.com -ParentDomainName adatum.com -DomainType TreeDomain -InstallDns
+# Add a new Forest
+Install-ADDSForest -DomainName adatum.com -InstallDns
+
+@Schema Management
+regsvr32 schmmgmt.dll # Register schema console
+regsvr32 -u schmmgmt.dll # Unregister schema console`
+                    },
+                    {
+                        id: 'ad-objects',
+                        title: 'Exercise 3: ADDS Object Management',
+                        rawCode: `@Organizational Units (OU)
+New-ADOrganizationalUnit -Name NTIC # Create root OU
+New-ADOrganizationalUnit -Name TRI -Path "ou=ntic,dc=adatum,dc=com" # Create sub-OU
+New-ADOrganizationalUnit -Name MIR -Path "ou=ntic,dc=adatum,dc=com"
+Get-ADOrganizationalUnit -Filter * | Format-Table # List all OUs
+Set-ADOrganizationalUnit -Identity "ou=MIR,ou=ntic,dc=adatum,dc=com" -ProtectedFromAccidentalDeletion $false # Disable deletion protection
+Remove-ADOrganizationalUnit -Identity "ou=mir,ou=ntic,dc=adatum,dc=com" -Confirm:$false # Delete an OU
+
+@Users
+New-ADUser -Name TriUser1 -Path "ou=tri,ou=ntic,dc=adatum,dc=com" # Create simple user
+# Create with password
+New-ADUser -Name TriUser2 -Path "ou=tri,ou=ntic,dc=adatum,dc=com" -AccountPassword (ConvertTo-SecureString -AsPlainText 'Pa$$w0rd' -Force)
+# Modify user properties
+Set-ADUser -Identity "cn=triuser1,ou=tri,ou=ntic,dc=adatum,dc=com" -Department service -GivenName Prenom -Surname Nom -DisplayName "Prenom Nom" -UserPrincipalName "triuser1@adatum.com"
+Remove-ADUser -Identity "cn=triuser1,ou=tri,ou=ntic,dc=adatum,dc=com" # Delete user
+
+@Container Redirection
+redircmp.exe "ou=NewComputers,dc=Adatum,dc=com" # Redirect default computers
+redirusr.exe "ou=NewUsers,dc=Adatum,dc=com" # Redirect default users
+
+@Computers
+New-ADComputer -Name Poste01 -Path "ou=TRI,ou=NTIC,dc=Adatum,dc=com" # Create computer account
+Set-ADComputer "cn=Poste01,ou=TRI,ou=NTIC,dc=Adatum,dc=com" -Location "Salle Info1" # Modify location
+Remove-ADComputer "cn=Poste01,ou=tri,ou=ntic,dc=adatum,dc=com" # Delete computer
+
+@Security and Groups
+# Reset password
+Set-ADAccountPassword -Identity "cn=triuser1,ou=tri,ou=ntic,dc=adatum,dc=com" -NewPassword (ConvertTo-SecureString -AsPlainText 'Pa$$w0rd' -Force) -Reset
+Enable-ADAccount -Identity "cn=triuser1,ou=tri,ou=ntic,dc=adatum,dc=com" # Enable account
+Disable-ADAccount -Identity "cn=triuser1,ou=tri,ou=ntic,dc=adatum,dc=com" # Disable account
+# Create Groups
+New-ADGroup TRIGroupDistribution -GroupCategory Distribution -GroupScope Global -Path "ou=tri,ou=ntic,dc=adatum,dc=com"
+New-ADGroup TRIGroupSecurity -GroupCategory Security -GroupScope Global -Path "ou=tri,ou=ntic,dc=adatum,dc=com"
+# Member Management
+Add-ADGroupMember -Identity TRIGroupSecurity -Members "TRiUser1","TRiUser2"
+Remove-ADGroupMember -Identity TRIGroupSecurity -Members "TRiUser1","TRiUser2" -Confirm:$false
+
+@Object Movements
+Rename-ADObject "cn=TriUser3,ou=TRI,ou=NTIC,dc=adatum,dc=com" -NewName "TRI3" # Rename object
+Move-ADObject "cn=TRI3,ou=TRI,ou=NTIC,dc=adatum,dc=com" -TargetPath "ou=NTIC,dc=adatum,dc=com" # Move object`
+                    },
+                    {
+                        id: 'dns-server',
+                        title: 'Exercise 4: DNS Server Management',
+                        rawCode: `@DNS Zones
+Install-WindowsFeature DNS -IncludeManagementTools # Install role
+Add-DnsServerPrimaryZone -Name ofppt.ma -ZoneFile ofppt.ma.dns -DynamicUpdate NonsecureAndSecure # Standard primary zone
+Add-DnsServerPrimaryZone -Name ofppt.com -ReplicationScope Domain # AD integrated zone
+Add-DnsServerPrimaryZone -NetworkId 172.18.0.0/16 -ZoneFile 18.172.in-addr.arpa.dns # Reverse lookup zone
+Add-DnsServerSecondaryZone -Name adatum.com -MasterServers 172.16.0.10 -ZoneFile adatum.com.dns # Secondary zone
+
+@Transfer and Replication
+Set-DnsServerPrimaryZone -Name adatum.com -Notify NotifyServers -SecondaryServers 172.16.0.21 -SecureSecondaries TransferToSecureServers # Configure transfer
+Start-DnsServerZoneTransfer -Name adatum.com -FullTransfer # Force full transfer (AXFR)
+ConvertTo-DnsServerPrimaryZone -Name ofppt.ma -ReplicationScope Domain -Force # Convert to AD integrated
+
+@Records
+Add-DnsServerResourceRecordA -ZoneName ofppt.ma -Name lon-client1 -IPv4Address 172.18.0.50 -CreatePtr # Create A + PTR
+Add-DnsServerResourceRecordAAAA -ZoneName ofppt.ma -Name lon-client1 -IPv6Address 2001::1 # Create AAAA
+Add-DnsServerResourceRecordMX -ZoneName ofppt.ma -Name "." -MailExchange lon-mail2.ofppt.ma -Preference 10 # Create MX
+Add-DnsServerResourceRecordCName -ZoneName ofppt.ma -Name www -HostNameAlias lon-client.ofppt.ma # Create CNAME
+Add-DnsServerResourceRecord -Srv -ZoneName ofppt.ma -DomainName ofppt.ma -Name _sip._tcp -Priority 0 -Weight 0 -Port 5600 # Create SRV
+Add-DnsServerStubZone -Name adatum.com -MasterServers 172.16.0.10 -ZoneFile adatum.com.dns # Create Stub Zone`
+                    },
+                    {
+                        id: 'dhcp-server',
+                        title: 'Exercise 5: DHCP Server Management',
+                        rawCode: `@Server Configuration
+Install-WindowsFeature DHCP -IncludeManagementTools # Install role
+Add-DhcpServerInDC -DnsName lon-svr1.adatum.com -IPAddress 172.16.0.21 # Authorize in AD
+Add-DhcpServerSecurityGroup # Create security groups
+
+@Scopes
+Add-DhcpServerv4Scope -Name ofppt -StartRange 172.18.0.50 -EndRange 172.18.0.150 -SubnetMask 255.255.255.0 # Create pool
+Add-DhcpServerv4ExclusionRange -ScopeId 172.18.0.0 -StartRange 172.18.0.70 -EndRange 172.18.0.90 # Add exclusion
+
+@DHCP Options
+Set-DhcpServerv4OptionValue -ScopeId 172.18.0.0 -Router 172.18.0.1 # Gateway (Option 003)
+Set-DhcpServerv4OptionValue -ScopeId 172.18.0.0 -DnsServer 172.18.0.10 # DNS (Option 006)
+Set-DhcpServerv4OptionValue -ComputerName lon-svr1.adatum.com -OptionId 3 -Value 172.18.0.10 # Server level option
+
+@Reservations
+Add-DhcpServerv4Reservation -ScopeId 172.18.0.0 -ClientId 00-f0-c4-55-44-33 -IPAddress 172.18.0.60 # Create MAC reservation
+Set-DhcpServerv4OptionValue -ReservedIP 172.18.0.60 -Router 172.18.0.30 # Specific reservation option`
+                    },
+                    {
+                        id: 'gpo-dfs',
+                        title: 'Exercise 6: GPO & DFS (Group Policies)',
+                        rawCode: `@Basic GPO Management
+New-GPO -Name "cmd" # Create a new GPO
+New-GPLink -Name "cmd" -Target "ou=tri,dc=ntic,dc=ma" -LinkEnabled Yes # Link GPO to an OU
+Rename-GPO -Name "ancien nom" -TargetName "nouveau nom" # Rename a GPO
+Remove-GPLink -Name "NomGPO" -Target "dn" # Remove a link
+Remove-GPO -Name "NomGPO" # Permanently delete a GPO
+gpupdate /force # Force policy update
+
+@Folder Redirection & Scripts
+New-Item -Path "C:\\Redirect" -ItemType Directory # Create redirection folder
+New-SmbShare -Name "Redirect" -Path "C:\\Redirect" -FullAccess "Everyone" # Share the folder
+New-GPO -Name "Redirection des dossiers" -Comment "Redirige les documents vers \\\\PDC\\Redirect" # Create the GPO
+New-GPLink -Name "Redirection des dossiers" -Target "dc=ntic,dc=ma" # Link to domain
+
+@Logon Script
+$Content = "Net use Z: \\\\PDC\\Redirect" # Define script content
+$Path = "\\\\ntic.ma\\NETLOGON\\Map.bat" # Define network path
+Set-Content -Path $Path -Value $Content # Create batch file
+New-GPO -Name "DriveMap" # Create mapping GPO
+New-GPLink -Name "DriveMap" -Target "dc=ntic,dc=ma" # Link to domain
+Set-GPLogonScript -Name "DriveMap" -ScriptPath $Path # Assign script to GPO
+
+@Security (USB & Control Panel)
+New-ADOrganizationalUnit -Name "TRI" -Path "dc=ntic,dc=ma" # Create Target OU
+New-ADUser -Name "mourad" -Path "ou=TRI,dc=ntic,dc=ma" -AccountPassword (Read-Host -AsSecureString "Enter Password") -Enabled $true # Create test user
+# Block USB via Registry
+New-GPO -Name "TPO_GPO_USB_Blockage" -Comment "Blocks USB and CP"
+Set-GPRegistryValue -Name "TPO_GPO_USB_Blockage" -Key "HKLM\\SYSTEM\\CurrentControlSet\\Services\\USBSTOR" -ValueName "Start" -Type DWord -Value 4
+# Block Control Panel
+Set-GPRegistryValue -Name "TPO_GPO_USB_Blockage" -Key "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer" -ValueName "NoControlPanel" -Type DWord -Value 1
+New-GPLink -Name "TPO_GPO_USB_Blockage" -Target "ou=TRI,dc=ntic,dc=ma" -Enforced Yes # Link and Enforce
+
+@Software Deployment
+New-Item -Path "C:\\software" -ItemType Directory # Source folder
+New-SmbShare -Name "software" -Path "C:\\software" -FullAccess "Everyone" # SMB Share
+New-GPO -Name "GPO_software" # Create GPO
+New-GPLink -Name "GPO_software" -Target "ou=TRI,dc=ntic,dc=ma" # Link to OU`
+                    }
+                ];
 
                 const currentSectionsData = computed(() => {
                     return language.value === 'fr' ? sectionsDataFr : sectionsDataEn;
